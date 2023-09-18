@@ -4,20 +4,31 @@
 
 int main(int argc, char *argv[]){
 
- ////////////////////////////// MENU INICIAL //////////////////////////////
+/* ---------------------------------------- CONFIGURACOES INICIAIS DE MENU ---------------------------------------- */
     int n, p;
     printf("\nJOGO DA VELHA++\n");
 
     printf("\nCONFIGURACAO INICIAL\n");
+
     printf("\nDIMENSAO DO TABULEIRO\n");
     printf("Digite a dimensao N do tabuleiro. Exemplo: para N = 3, digite o numero 3.\n");
     printf("Digite a dimensao do tabuleiro: ");
     scanf("%d", &n);
-    char M[n][n];
+
+    //Tratamento de erro para tabuleiro com dimensao negativa ou igual a zero
+    if(n <= 0){
+        while(n <= 0){
+            printf("Tamanho invalido. Digite novamente: ");
+            scanf("%d", &n);
+        }
+    }
+
+    char M[n][n]; //Dimensao do tabeuleiro
+
     for(int i=0;i<n;i++){
         for(int j=0;j<n;j++){
-            M[i][j]='-';}}
-
+            M[i][j]='-';}
+    }
     printf("\n-> Dimensao selecionada: %d x %d\n", n,n);
 
     printf("\nSEQUENCIA DO VENCEDOR\n");
@@ -26,8 +37,24 @@ int main(int argc, char *argv[]){
     //Aqui tem que colocar o tratamento de caso em que S > N: isso nao pode acontecer
 
     scanf("%d", &p);
+
+    //Tratamento de erro para sequencia maior que tabuleiro ou sequencia negativa
+    //ARRUMAR ESSE TRATAMENTO DE ERRO PQ NAO FICOU BOM!!!
+    if(p > n || p < 0){
+        int flag = 0;
+        while(!flag){
+            printf("Tamanho invalido. Digite novamente: ");
+            scanf("%d", &n);
+            if(p > n || p < 0){
+                flag = 0;
+            } else{
+                flag = 1;
+            }
+        }
+    }
     printf("\n-> Tamanho de sequencia escolhido: %d\n", p);
 
+    //FAZER TRATAMENTO DE ERRO PARA ESSE CASO TAMBEM
     printf("\nQUANTIDADE DE JOGADORES\n");
     printf("Digite a quantidade de jogadores. Exemplo: para 5 jogadores, digite o numero 5.\n");
     printf("Digite o numero de jogadores que irao jogar: ");
@@ -59,7 +86,7 @@ int main(int argc, char *argv[]){
 
     printf("\n\n-TUDO PRONTO, O JOGO COMECOU!-\n\n");
 
-    ////////////////////////////// CODIGO DO JOGO //////////////////////////////
+/* -------------------------------------------------- CODIGO DO JOGO -------------------------------------------------- */
 
     int win(char x){
         //procura vencedor em linhas, colunas ou diagonais
@@ -221,4 +248,6 @@ int main(int argc, char *argv[]){
         printf("Jogador %c ganhou!!!\n", joga[i].simb);}
     else{
         printf("Jogo empatado\n");}}
+
+        //AQUI TEM QUE ARRUMAR PARA VOLTAR AO INICIO DO JOGO
 
