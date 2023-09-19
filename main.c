@@ -101,7 +101,6 @@ int main(int argc, char *argv[]){
                 }
             }
         }
-
         for(int i = 0; i < n-p+1; i++){
             for(int j = 0; j < n-p+1; j++){
                 int contD1 = 0;
@@ -281,8 +280,7 @@ int main(int argc, char *argv[]){
     int mostra(){
         printf("  %c",'A');
         for(int i = 1; i < n; i++){
-            printf(" %c", 65+i)
-            ;
+            printf(" %c", 65+i;
         }
         printf("\n");
         for(int i = 0; i < n; i++){
@@ -295,6 +293,7 @@ int main(int argc, char *argv[]){
     }
 
     //Funcao que faz a jogada do usuario
+    //FAZER TRATAMENTO DE ERRO QUANDO UM USUARIO JOGA NUM LUGAR INVALIDO!!!
     int jogapessoa(char x){
         int l;
         char c;
