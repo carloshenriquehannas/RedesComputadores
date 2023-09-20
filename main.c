@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <ctype.h>
 
 int main(int argc, char *argv[]){
 
@@ -18,7 +20,7 @@ int main(int argc, char *argv[]){
 
     printf("\nJOGO DA VELHA++\n");
 
-    printf("\nCONFIGURACAO INICIAL\n");
+    inicio: printf("\nCONFIGURACAO INICIAL\n");
 
     printf("\nDIMENSAO DO TABULEIRO\n");
     printf("Digite a dimensao N do tabuleiro. Exemplo: para N = 3, digite o numero 3.\n");
@@ -280,7 +282,7 @@ int main(int argc, char *argv[]){
     int mostra(){
         printf("  %c",'A');
         for(int i = 1; i < n; i++){
-            printf(" %c", 65+i;
+            printf(" %c", 65+i);
         }
         printf("\n");
         for(int i = 0; i < n; i++){
@@ -293,16 +295,20 @@ int main(int argc, char *argv[]){
     }
 
     //Funcao que faz a jogada do usuario
-    //FAZER TRATAMENTO DE ERRO QUANDO UM USUARIO JOGA NUM LUGAR INVALIDO!!!
     int jogapessoa(char x){
-        int l;
+        int l = 5;
         char c;
-        scanf("%c",&c); //Coluna em que vai jogar
-        scanf("%d",&l); //Linha em que vai jogar
-        if (M[l-1][c-'A'] == '-'){
-            M[l-1][c-'A'] = x;
-            return 0;
-        }
+
+        printf("Digite a posicap que ira jogar: ");
+        do {
+            scanf("\n%c%d", &c,&l); //Coluna em que vai jogar
+            if(c < 'A' || c > 'A' + (n - 1) || l > n){
+                printf("Posicao %c,%d invalida. Jogue novamente: ", c,l);
+            } else if (M[l - 1][c - 'A'] == '-') {
+                M[l - 1][c - 'A'] = x;
+                return 0;
+            }
+        } while(l < 'A' || l > 'A' + (x - 1) || c > x);
         return 1;
     }
 
@@ -342,7 +348,22 @@ int main(int argc, char *argv[]){
         printf("Jogo empatado\n");
     }
 
-    //AQUI TEM QUE ARRUMAR PARA VOLTAR AO INICIO DO JOGO
+    //Tratamento caso o jogador queira jogar de novo ou sair do jogo
+    char again[10];
+    printf("Digite a palavra JOGAR e pressione ENTER para jogar novamente. Aperte qualquer tecla para sair e pressione ENTER.\n");
+    printf("Digite aqui: ");
+    scanf("%s", again);
+    //strlen(again) - 1 = '\0';
+    //again[strlen(again) - 1] = '\0';
+    for(i = 0; i < strlen(again); i++){
+        again[i] = toupper(again[i]);
+    }
+
+    printf("%s", again);
+
+    if(!(strcmp(again, "JOGAR"))){
+        goto inicio;
+    }
 }
 
 
