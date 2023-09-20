@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
         if (n <= 0){
             printf("Tamanho invalido. Digite novamente: ");
         }
-    } while(n <= 0); //Tratamento de erro para dimensao de tabuleiro
+    } while(n <= 0 ); //Tratamento de erro para dimensao de tabuleiro
     printf("\n-> Dimensao selecionada: %d x %d\n", n, n);
 
     //Criacao do tabuleiro com a respectiva dimensao e preenchimento dele com - (vazio)
@@ -299,9 +299,11 @@ int main(int argc, char *argv[]){
         int l = 5;
         char c;
 
-        printf("Digite a posicap que ira jogar: ");
+        printf("Digite a letra da coluna, em seguida o numero da linha.\n");
+        printf("Digite aqui: ");
         do {
             scanf("\n%c%d", &c,&l); //Coluna em que vai jogar
+            c = toupper(c); //Letra que representa a coluna em maiusculo, independente da entrada
             if(c < 'A' || c > 'A' + (n - 1) || l > n){
                 printf("Posicao %c,%d invalida. Jogue novamente: ", c,l);
             } else if (M[l - 1][c - 'A'] == '-') {
@@ -353,13 +355,10 @@ int main(int argc, char *argv[]){
     printf("Digite a palavra JOGAR e pressione ENTER para jogar novamente. Aperte qualquer tecla para sair e pressione ENTER.\n");
     printf("Digite aqui: ");
     scanf("%s", again);
-    //strlen(again) - 1 = '\0';
-    //again[strlen(again) - 1] = '\0';
+
     for(i = 0; i < strlen(again); i++){
         again[i] = toupper(again[i]);
     }
-
-    printf("%s", again);
 
     if(!(strcmp(again, "JOGAR"))){
         goto inicio;
