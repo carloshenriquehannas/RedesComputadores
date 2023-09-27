@@ -8,8 +8,10 @@ int main(int argc, char *argv[]){
 
 /* ---------------------------------------- DEFINICOES DAS VARIAVEIS  ----------------------------------------------- */
 
+    // Declaração de variáveis
     int n, p, jog;
 
+    // Definição de uma estrutura de jogador
     struct jogador{
         int comp;
         char simb;
@@ -20,8 +22,10 @@ int main(int argc, char *argv[]){
 
     printf("\nJOGO DA VELHA++\n");
 
+    // Definição do menu de configuração inicial
     inicio: printf("\nCONFIGURACAO INICIAL\n");
 
+    // Configuração da dimensão do tabuleiro
     printf("\nDIMENSAO DO TABULEIRO\n");
     printf("Digite a dimensao N do tabuleiro. Exemplo: para N = 3, digite o numero 3.\n");
     printf("Digite a dimensao do tabuleiro: ");
@@ -40,6 +44,7 @@ int main(int argc, char *argv[]){
             M[i][j]='-';}
     }
 
+    // Configuração da sequência necessária para vencer
     printf("\nSEQUENCIA DO VENCEDOR\n");
     printf("Digite a sequencia P que define um vencedor. Exemplo: para P = 3, digite o numero 3.\n");
     printf("Digite a sequencia que define o vencerdor: ");
@@ -51,6 +56,7 @@ int main(int argc, char *argv[]){
     } while(!(p > 0 && p <= n)); //Tratamento de erro para sequencia de um vencedor
     printf("\n-> Tamanho de sequencia escolhido: %d\n", p);
 
+    // Configuração da quantidade de jogadores
     printf("\nQUANTIDADE DE JOGADORES\n");
     printf("Digite a quantidade de jogadores. Exemplo: para 5 jogadores, digite o numero 5.\n");
     printf("Digite o numero de jogadores que irao jogar: ");
@@ -74,10 +80,12 @@ int main(int argc, char *argv[]){
         scanf(" %c", &joga[i].simb);
     }
 
+    // Explicação do modo de jogar
     printf("\nMODO DE JOGAR\n");
     printf("Apos aparecer o tabuleiro, basta digitar a letra que representa a coluna e, em seguida, o numero que corresponde a linha em que quer jogar. Pressione ENTER no fim\n");
     printf("Exemplo: para jogar na primeira coluna e segunda linha, digite A2");
 
+    // Começar o jogo
     printf("\n\n-TUDO PRONTO, O JOGO COMECOU!-\n\n");
 
 /* -------------------------------------------------- CODIGO DO JOGO ------------------------------------------------ */
@@ -326,10 +334,12 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    // Verificação se o primeiro jogador não é uma máquina, se não for, exibir o tabuleiro
     if(joga[0].comp == 0){
         mostra();
     }
 
+    // Loop principal do jogo
     int i;
     for(i = 0;i <= jog; i++){
         if(i == jog){
@@ -344,6 +354,8 @@ int main(int argc, char *argv[]){
             break;
         }
     }
+
+    // Print do resultado do jogo
     if (win(joga[i].simb)){
         printf("Jogador %c ganhou!!!\n", joga[i].simb);
     } else{
@@ -364,6 +376,3 @@ int main(int argc, char *argv[]){
         goto inicio;
     }
 }
-
-
-
