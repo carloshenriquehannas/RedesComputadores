@@ -15,5 +15,12 @@ void b_create(g_structure *game);
 
 void p_create(g_structure *game);
 
+void *host_handler(void *arg);
+
+void *client_handler(void *arg);
+
+
+
+
 
 #endif

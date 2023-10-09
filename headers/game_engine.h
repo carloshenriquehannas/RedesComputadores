@@ -11,10 +11,12 @@ typedef struct {
 typedef struct {
 	int b_size;        	// tamanho do tabuleiro
 	int s_size;        	// tamanho da sequencia de vitoria
-	char **board;
-	int p_num;
-	p_structure *p_list; 
-	int g_status; 		// estado atual do jogo (0 jogo esta acontecendo, 1 alguem ganhou, -1 empatou)
+	char **board;           // tabuleiro do jogo
+	int p_num;              // numero max de jogadores
+	p_structure *p_list;    // lista de jogadores conectados
+	int g_ended; 		// estado atual do jogo (0 jogo esta acontecendo, 1 alguem ganhou, -1 empatou)
+	int p_connected; 	// numeros de jogadores conectados
+	int next_player;        // proximo a jogar
 } g_structure;
 
 // Funcao que testa se o jogador com o caracter 'x' venceu
