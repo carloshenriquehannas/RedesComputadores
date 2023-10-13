@@ -19,8 +19,4 @@ void *host_handler(void *arg);
 
 void *client_handler(void *arg);
 
-
-
-
-
 #endif

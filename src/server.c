@@ -10,7 +10,7 @@
 #include "../headers/game_engine.h"
 #include "../headers/server.h"
 
-int start = 0, processed = 0;
+int start = 0, processed = 1;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
@@ -52,6 +52,9 @@ int server(){
 
 	memset(&last_play, 0, sizeof(lp));
 	memset(&client_basic_info, 0, sizeof(cbi));
+
+	client_basic_info.b_size = game->b_size;
+	client_basic_info.s_size = game->s_size;
 
 	struct sockaddr_in s_addr, c_addr;  					// cria os enderecos de socket
 	socklen_t c_len = sizeof(c_addr);	
@@ -145,7 +148,8 @@ int server(){
 				last_play.end = -1;
 				game->g_ended = -1;
 			} else {		
-				game->next_player = (game->next_player + 1) % game->p_num;  	// atualiza o proximo jogador
+				game->next_player = (game->next_player + 1) % (game->p_connected + 1);  	// atualiza o proximo jogador
+				last_play.next_player = game->next_player;
 				processed = 1;				// define a informacao como processada
 			}
 			pthread_cond_broadcast(&cond); 					// avisa os clientes que as informacoes foram processadas
@@ -153,10 +157,23 @@ int server(){
 		pthread_mutex_unlock(&mutex);	
 	}
 	
+	pthread_join(h_thread, NULL);
+	for(int i = 0; i <  game->p_connected; i++){
+		pthread_join(c_threads[i], NULL);
+	}
+	
 	close(s_socket);
 	for(int i = 0; i < game->p_connected; i++){
 		close(c_sockets[i]);
 	}
+
+	for(int i = 0; i < game->b_size; i++){
+		free(game->board[i]);
+	}
+	free(game->board);
+	free(game->p_list);
+	free(game);
+	pthread_cond_destroy(&cond);
 	return 0;
 }
 
@@ -164,7 +181,7 @@ void *host_handler(void *arg){
 	thread_info *h_info = ((thread_info *) arg);
 
 	h_info->game->p_list[0].simb = (33 + h_info->player_id);
-	printf("Seu caracter eh: %c", h_info->game->p_list[0].simb);
+	printf("Seu caracter eh: '%c'\n\n", h_info->game->p_list[0].simb);
 	
 
 	printf("Para iniciar o jogo, aperte 0\n");
@@ -181,11 +198,12 @@ void *host_handler(void *arg){
 		pthread_mutex_lock(&mutex);
 		
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
-		while(h_info->game->next_player != h_info->player_id || !processed){
+		while((h_info->game->next_player != h_info->player_id || !processed) && !h_info->game->g_ended){
 			mostra(h_info->game);
 
 			pthread_cond_wait(&cond, &mutex);
 		}
+		if(h_info->game->g_ended) break;
 
 		// Avisa o usuario que eh a vez dele jogar
 		printf("Eh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
@@ -210,15 +228,17 @@ void *host_handler(void *arg){
 		pthread_mutex_unlock(&mutex);	
 	}	
 
-	printf("Fim de jogo!\n\n");
+	printf("\nFim de jogo!\n");
 
 	mostra(h_info->game);
 
 	switch(last_play.end){
 		case 1:
-			printf("Jogador %c venceu!\n", last_play.symb);
+			printf("\nJogador %c venceu!\n", last_play.symb);
+			break;
 		case -1:
-			printf("Empate!\n");
+			printf("\nEmpate!\n");
+			break;
 	}
 
 	return NULL;	
@@ -234,7 +254,7 @@ void *client_handler(void *arg){
 	client_basic_info.player_id = c_info->player_id;
 	client_basic_info.player_symbol = (33 + c_info->player_id);
 
-	if((b_sent = send(c_info->socket_id, &client_basic_info, sizeof(cbi), 0)) != -1){
+	if((b_sent = send(c_info->socket_id, &client_basic_info, sizeof(cbi), 0)) == -1){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
@@ -243,22 +263,23 @@ void *client_handler(void *arg){
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
-		while(c_info->game->next_player != c_info->player_id || !processed){
-			if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) != -1){
+		while((c_info->game->next_player != c_info->player_id || !processed) && !c_info->game->g_ended){
+			if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) == -1){
 				printf("Erro de comunicacao!\n");
 				exit(-1);
 			}		
 			pthread_cond_wait(&cond, &mutex);
 		}
+		if(c_info->game->g_ended) break;
 
 		// Avisa o usuario que eh a vez dele jogar
-		if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) != -1){
+		if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) == -1){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}		
 		
 		// Recebe a jogada do usuario (jah validada)
-		if((b_recv = recv(c_info->socket_id, &last_play, sizeof(lp) - 1, 0)) != -1){
+		if((b_recv = recv(c_info->socket_id, &last_play, sizeof(lp) - 1, 0)) == -1){
 			printf("Erro de comunicacao!\n");
 			exit(-1);	
 		}	
@@ -270,7 +291,7 @@ void *client_handler(void *arg){
 		pthread_mutex_unlock(&mutex);	
 	}	
 
-	if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) != -1){
+	if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) == -1){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
@@ -332,6 +353,8 @@ void b_create(g_structure *game){
 		}
 	}
 	game->p_connected = 0;
+	game->next_player = 0;
+	game->g_ended = 0;
 }
 
 void p_create(g_structure *game){

@@ -25,12 +25,15 @@ typedef struct {
 	int col;
 	char symb;
 	int end;
+	int next_player;
 } lp;
 
 // variavel para compartilhar informacoes basicas com o cliente
 typedef struct{
 	int player_id;
 	char player_symbol;
+	int b_size;
+	int s_size;
 } cbi;
 
 // Funcao que testa se o jogador com o caracter 'x' venceu

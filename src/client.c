@@ -8,12 +8,21 @@
 
 #include "../headers/client.h"
 #include "../headers/game_engine.h"
+#include "../headers/server.h"
 
 int client(){
 	int c_socket;
 	struct sockaddr_in s_addr;
 
-	g_structure *game;	
+	int b_recv, b_sent;
+
+	g_structure game;
+	
+	cbi client_basic_info;
+	lp last_play;
+
+	memset(&client_basic_info, 0, sizeof(cbi));
+	memset(&last_play, 0, sizeof(lp));
 	
 	// Cria o socket do cliente
 	c_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -44,10 +53,71 @@ int client(){
 	printf("Voce entrou na sala.\n");
 
 
+	if((b_recv = recv(c_socket, &client_basic_info, sizeof(cbi), 0)) == -1){
+		printf("Erro de comunicaco com o servidor!\n");
+		exit(-1);	
+	}
 
-	//if(b_recv = recv(
+	printf("Tamanho do tabuleiro: %d\nTamanho da sequencia: %d\nSeu caractere: %c\n\n", client_basic_info.b_size, client_basic_info.s_size, client_basic_info.player_symbol);
 
+	game.b_size = client_basic_info.b_size;
+	game.s_size = client_basic_info.s_size;
 
+	b_create(&game);	
+
+	while(!last_play.end){
+		if((b_recv = recv(c_socket, &last_play, sizeof(lp), 0)) == -1){
+			printf("Erro de comunicacao!\n");
+			exit(-1);
+		}	
+
+		game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
+		mostra(&game);
+		
+
+		// Se for a vez do jogador
+		if(last_play.next_player == client_basic_info.player_id){
+			// Recebe mensagem do servidor para avisar que ele estara pronto para ouvir
+			if((b_recv = recv(c_socket, &last_play, sizeof(lp), 0)) == -1){
+				printf("Erro de comunicacao!\n");
+				exit(-1);
+			}	
+
+			// Avisa o usuario que eh a vez dele jogar
+			printf("Eh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
+
+			// Recebe a jogada do usuario (jah validada)
+	            	int row, col;
+                   	while(1){
+                        	scanf("%d %d", &row, &col);
+                           	if(row <= client_basic_info.b_size && col <= client_basic_info.b_size && col > 0 && row > 0 && game.board[row - 1][col - 1] == '-'){
+                                   	break;
+                           	}
+                           	printf("Jogada invalida!\n");
+			}
+
+			last_play.row = row;
+			last_play.col = col;
+			last_play.symb = client_basic_info.player_symbol;
+
+			if((b_sent = send(c_socket, &last_play, sizeof(lp), 0)) == -1){
+				printf("Erro de comunicacao!\n");
+				exit(-1);		
+			}
+		}
+	}
+
+	if((b_recv = recv(c_socket, &last_play, sizeof(lp), 0)) == -1){
+		printf("Erro de comunicacao!\n");
+		exit(-1);
+	}
+
+	switch(last_play.end){
+                 case 1:
+                         printf("Jogador %c venceu!\n", last_play.symb);
+                 case -1:
+                         printf("Empate!\n");
+         }
 
 	return 0;
 }
@@ -56,3 +126,5 @@ void get_lobby_code(char *ip){
 	printf("Digite o ip do hospedeiro: ");
 	fgets(ip, sizeof(ip),stdin);
 }
+
+
