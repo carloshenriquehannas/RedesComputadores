@@ -382,74 +382,34 @@ void p_create(g_structure *game){
 }
 
 int send_basic_info(int c_socket, cbi *client_basic_info){
-	int aux, b_sent;
-	char aux2;
+	int b_sent;
+	char aux[sizeof(cbi)];
 
-	// Envia id do jogador
-	aux = htonl(client_basic_info->player_id);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-
-	// Envia tamanho do tabuleiro
-	aux = htonl(client_basic_info->b_size);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-
-	// Envia tamanho da sequencia
-	aux = htonl(client_basic_info->s_size);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-
-	// Envia o caracter do jogador
-	aux2 = client_basic_info->player_symbol;
-	if((b_sent = send(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
+	// Envia a ultima jogada
+	memcpy(aux, client_basic_info, sizeof(cbi));
+	if((b_sent = send(c_socket, &aux, sizeof(cbi), 0)) == -1) return 0;
 
 	return 1;
 }
 
 int recv_last_play(int c_socket, lp *last_play){
-	int aux, b_recv;
-	char aux2;
+	char aux[sizeof(lp)];
+	int b_recv;
 
-	// Recebe as coordenadas da jogada e o simbolo
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	last_play->row = ntohl(aux);
-
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	last_play->col = ntohl(aux);
-
-	if((b_recv = recv(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
-	last_play->symb = aux;
-
-	// Recebe flag se o jogo acabou
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	last_play->end = ntohl(aux);
-
-	// Recebe o proximo jogador
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	last_play->next_player = ntohl(aux);
+	// Recebe a ultima jogada
+	if((b_recv = recv(c_socket, &aux, sizeof(lp), 0)) == -1) return 0;
+	memcpy(last_play, aux, sizeof(lp));
 
 	return 1;
 }
 
 int send_last_play(int c_socket, lp *last_play){
-	int aux, b_sent;
-	char aux2;
+	int b_sent;
+	char aux[sizeof(lp)];
 
-	// Recebe as coordenadas da jogada e o simbolo
-	aux = htonl(last_play->row);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-
-	aux = htonl(last_play->col);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-
-	aux2 = last_play->symb;
-	if((b_sent = send(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
-
-	// Recebe flag se o jogo acabou
-	aux = htonl(last_play->end);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-
-	// Recebe o proximo jogador
-	aux = htonl(last_play->next_player);
-	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	// Envia a ultima jogada
+	memcpy(aux, last_play, sizeof(lp));
+	if((b_sent = send(c_socket, &aux, sizeof(lp), 0)) == -1) return 0;
 
 	return 1;
 }

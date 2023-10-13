@@ -141,24 +141,12 @@ int get_lobby_code(char *ip){
 }
 
 int recv_basic_info(int c_socket, cbi *client_basic_info){
-	int aux, b_recv;
-	char aux2;
+	int b_recv;
+	char aux[sizeof(cbi)];
 
 	// Recebe id do jogador
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	client_basic_info->player_id = ntohl(aux);
-
-	// Recebe tamanho do tabuleiro
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	client_basic_info->b_size = ntohl(aux);
-
-	// Recebe tamanho da sequencia
-	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
-	client_basic_info->s_size = ntohl(aux);
-
-	// Recebe o caracter do jogador
-	if((b_recv = recv(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
-	client_basic_info->player_symbol = aux2;
+	if((b_recv = recv(c_socket, &aux, sizeof(cbi), 0)) == -1) return 0;
+	memcpy(client_basic_info, aux, sizeof(cbi));
 
 	return 1;
 }
