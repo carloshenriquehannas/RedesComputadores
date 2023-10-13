@@ -214,6 +214,7 @@ void *host_handler(void *arg){
 	
 	while(!h_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
+		printf("Mostrou uma vez!\n");
 		
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((h_info->game->next_player != h_info->player_id || !processed) && !h_info->game->g_ended){
@@ -282,12 +283,12 @@ void *client_handler(void *arg){
 	
 	while(!start);
 
-	printf("Batata\n");
 	
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((c_info->game->next_player != c_info->player_id || !processed) && !c_info->game->g_ended){
+			printf("Batata\n");
 			// Envia a ultima jogada ao cliente
 			if(!send_last_play(c_info->socket_id, &last_play)){
 				printf("Erro de comunicacao!\n");
