@@ -78,12 +78,6 @@ int client(){
 		// Se for a vez do jogador
 		printf("Proximo: %d\nMeu id: %d\n", last_play.next_player, client_basic_info.player_id);
 		if(last_play.next_player == client_basic_info.player_id){
-			// Recebe mensagem do servidor para avisar que ele estara pronto para ouvir
-			if((b_recv = recv(c_socket, &last_play, sizeof(lp), 0)) == -1){
-				printf("Erro de comunicacao!\n");
-				exit(-1);
-			}	
-
 			// Avisa o usuario que eh a vez dele jogar
 			printf("Eh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
 
