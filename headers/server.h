@@ -19,4 +19,5 @@ void *host_handler(void *arg);
 
 void *client_handler(void *arg);
 
+int read_ip(char *ip);
 #endif

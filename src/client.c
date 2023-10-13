@@ -33,21 +33,20 @@ int client(){
 	
 	while(1){
 		// Recebe o codigo da sala para conexao
-		char ip[16];
+		char ip[16] = {0};
 		if(get_lobby_code(ip)){
 
 			// Inicializa a estrutura de endereco do servidor
 			memset(&s_addr, 0, sizeof(s_addr));
 			s_addr.sin_family = AF_INET;
 			s_addr.sin_port = htons(8080);
-			inet_pton(AF_INET, ip, &s_addr.sin_addr);
+			s_addr.sin_addr.s_addr = inet_addr(ip);
 
 			// Conecta ao servidor
-			if(connect(c_socket, (struct sockaddr *)&system call connects the socket referred to by_addr, sizeof(s_addr)) != -1){
+			if(connect(c_socket, (struct sockaddr *)&s_addr, sizeof(s_addr)) != -1){
 				break;
 			} else {
-				printf("\nNao foi possivel conectar a sala. Verifique o codigo e tente novamente.\n");
-			}
+				printf("Nao foi possivel conectar ao servidor. Tente novamente.\n");
 		}
 	}
 	
@@ -127,10 +126,7 @@ int get_lobby_code(char *ip){
 	char input[100];
 
     	printf("Digite o endereco de IP: ");
-    	if (fgets(input, sizeof(input), stdin) == NULL) {
-        	perror("Error reading input");
-        	return 0;
-    	}
+	scanf("%s", input);
 
     	// Remove o '\n'
     	size_t input_length = strlen(input);
