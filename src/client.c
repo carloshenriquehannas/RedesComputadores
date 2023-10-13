@@ -126,14 +126,18 @@ int get_lobby_code(char *ip){
 	char input[100];
 
     	printf("Digite o endereco de IP: ");
-	scanf("%s", input);
+	fgets(input, sizeof(input) - 1, stdin);
 
-    	// Remove o '\n'
-    	size_t input_length = strlen(input);
-    	if (input_length > 0 && input[input_length - 1] == '\n') {
-        	input[input_length - 1] = '\0';
-    	}
-    	return 1;
+	int i = 0;
+	while(input[i] != '\n'){
+		ip[i] = input[i];
+		i++;
+	}
+	ip[i] = '\0';
+
+    	if(strlen(ip) > 0 && strlen(ip) <= 16)return 1;
+
+	return 0;
 }
 
 

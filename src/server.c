@@ -59,6 +59,7 @@ int server(){
 
 	struct sockaddr_in s_addr, c_addr;  					// cria os enderecos de socket
 	socklen_t c_len = sizeof(c_addr);	
+	struct pollfd poll_fds[game->p_num]; 					// cria a lista de eventos de poll
 
 	// Cria o socket do servidor
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -68,12 +69,11 @@ int server(){
 	}
 	
 	// Configura o endereco do servidor
-	char ip[16];
-	while(!read_ip(ip));
+	memset(&s_addr, 0 , sizeof(s_addr));
 	s_addr.sin_family = AF_INET;
 	s_addr.sin_port = htons(8080);
-	s_addr.sin_addr.s_addr = inet_addr(ip);
-	
+	s_addr.sin_addr.s_addr = INADDR_ANY;
+
 	// 'Bind' do servidor ao ip
 	if(bind(s_socket, (struct sockaddr *)&s_addr, sizeof(s_addr)) == -1){
 		printf("Erro! Falha ao fazer o bind\n");
@@ -88,6 +88,10 @@ int server(){
 
 	printf("Sala criada!\n");
 	
+	// define o socket do servidor como o descritor que o poll vai cuidar
+	poll_fds[0].fd = s_socket;
+    	poll_fds[0].events = POLLIN;
+
 	// declara as threads do host e dos clientes
 	pthread_t h_thread;
 	pthread_t c_threads[game->p_num - 1];
@@ -106,24 +110,34 @@ int server(){
 
 	// Tenta coneccao com os outros jogadores ate o host decidir comecar o jogo
 	
-	while(!start && game->p_connected < (game->p_num - 1)){	
-		
-		// Aceita uma nova conexao com um cliente
-            	c_sockets[game->p_connected] = accept(s_socket, (struct sockaddr *)&c_addr, &c_len);
-            	if (c_sockets[game->p_connected] == -1) {
-                	printf("Erro ao aceitar a conexao\n");
-            	} else {
-                	printf("Jogador conectado! FD: %d\n", c_sockets[game->p_connected]);
+	while(!start){	
+		// Aceitar uma conexao
+		int num_events = poll(poll_fds, game->p_connected + 1, 200);
+        	if (num_events == -1) {
+            		perror("poll");
+            		exit(EXIT_FAILURE);
+        	}
 
-                	// Cria uma nova thread para lidar com o cliente
-			ct_info[game->p_connected].player_id = game->p_connected - 1;
-                	if (pthread_create(&c_threads[game->p_connected], NULL, client_handler, &(ct_info[game->p_connected])) != 0) {
-                  		perror("Erro ao criar a thread\n");
-				exit(-1);
-                	} else {
-                    		(game->p_connected)++;
-                	}
-            	}	
+        	// Confere se o socket que esta ouvindo recebeu uma requisicao
+        	if ((poll_fds[0].revents & POLLIN) && game->p_connected < game->p_num - 1) {
+
+            		// Aceita uma nova conexao com um cliente
+            		c_sockets[game->p_connected] = accept(s_socket, (struct sockaddr *)&c_addr, &c_len);
+            		if (c_sockets[game->p_connected] == -1) {
+                		printf("Erro ao aceitar a conexao\n");
+            		} else {
+                		printf("Jogador conectado! FD: %d\n", c_sockets[game->p_connected]);
+
+                		// Cria uma nova thread para lidar com o cliente
+				ct_info[game->p_connected].player_id = game->p_connected - 1;
+                		if (pthread_create(&c_threads[game->p_connected], NULL, client_handler, &(ct_info[game->p_connected])) != 0) {
+                    			perror("Erro ao criar a thread\n");
+					exit(-1);
+                		} else {
+                    			(game->p_connected)++;
+                		}
+            		}	
+		}
 	}
 	
 	while(!game->g_ended){
@@ -357,19 +371,4 @@ void b_create(g_structure *game){
 // Cria a lista de jogadores
 void p_create(g_structure *game){
 	game->p_list = malloc(sizeof(p_structure) * game->p_num);	
-}
-
-// Le o IP do teclado
-int read_ip(char *ip){
-	char input[100];
-
-    	printf("Digite o endereco de IP: ");
-	scanf("%s", input);
-
-    	// Remove o '\n'
-    	size_t input_length = strlen(input);
-    	if (input_length > 0 && input[input_length - 1] == '\n') {
-        	input[input_length - 1] = '\0';
-    	}
-    	return 1;
 }
