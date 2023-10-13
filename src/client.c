@@ -53,7 +53,7 @@ int client(){
 	printf("Voce entrou na sala.\n");
 
 
-	if((b_recv = recv(c_socket, &client_basic_info, sizeof(cbi), 0)) == -1){
+	if(!recv_basic_info(c_socket, &client_basic_info)){
 		printf("Erro de comunicaco com o servidor!\n");
 		exit(-1);	
 	}
@@ -66,7 +66,7 @@ int client(){
 	b_create(&game);	
 
 	while(!last_play.end){
-		if((b_recv = recv(c_socket, &last_play, sizeof(lp), 0)) == -1){
+		if(!recv_last_play(c_socket, &last_play)){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}	
@@ -100,14 +100,14 @@ int client(){
 			last_play.col = col;
 			last_play.symb = client_basic_info.player_symbol;
 
-			if((b_sent = send(c_socket, &last_play, sizeof(lp), 0)) == -1){
+			if(!send_last_play(c_socket, &last_play)){
 				printf("Erro de comunicacao!\n");
 				exit(-1);		
 			}
 		}
 	}
 
-	if((b_recv = recv(c_socket, &last_play, sizeof(lp), 0)) == -1){
+	if(!recv_last_play(c_socket, &last_play)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}
@@ -140,4 +140,26 @@ int get_lobby_code(char *ip){
 	return 0;
 }
 
+int recv_basic_info(int c_socket, cbi *client_basic_info){
+	int aux, b_recv;
+	char aux2;
+
+	// Recebe id do jogador
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	client_basic_info->player_id = ntohl(aux);
+
+	// Recebe tamanho do tabuleiro
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	client_basic_info->b_size = ntohl(aux);
+
+	// Recebe tamanho da sequencia
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	client_basic_info->s_size = ntohl(aux);
+
+	// Recebe o caracter do jogador
+	if((b_recv = recv(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
+	client_basic_info->player_symbol = aux2;
+
+	return 1;
+}
 

@@ -255,17 +255,20 @@ void *host_handler(void *arg){
 
 // Thread do cliente
 void *client_handler(void *arg){
+	// Informacoes passadas pela thread
 	thread_info *c_info = ((thread_info *) arg);
 	
 	int b_recv, b_sent;
 
+	// atribui um simbolo ao jogador
 	c_info->game->p_list[c_info->player_id].simb = (char) (33 + c_info->player_id);
 
+	// atualiza a estrutura de dados basica a ser passada ao cliente
 	client_basic_info.player_id = c_info->player_id;
 	client_basic_info.player_symbol = (33 + c_info->player_id);
 	printf("%d\n", c_info->player_id);
 
-	if((b_sent = send(c_info->socket_id, &client_basic_info, sizeof(cbi), 0)) == -1){
+	if(!send_basic_info(c_info->socket_id, &client_basic_info)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
@@ -276,25 +279,28 @@ void *client_handler(void *arg){
 		pthread_mutex_lock(&mutex);
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((c_info->game->next_player != c_info->player_id || !processed) && !c_info->game->g_ended){
-			if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) == -1){
+			// Envia a ultima jogada ao cliente
+			if(!send_last_play(c_info->socket_id, &last_play)){
 				printf("Erro de comunicacao!\n");
 				exit(-1);
 			}		
+			// Espera a condicao ser atingida
 			pthread_cond_wait(&cond, &mutex);
 		}
+		// Confere se o jogo nao acabou enquanto esperava pela condicao
 		if(c_info->game->g_ended) break;
 
 		// Avisa o usuario que eh a vez dele jogar
-		if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) == -1){
+		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}		
 		
 		// Recebe a jogada do usuario (jah validada)
-		if((b_recv = recv(c_info->socket_id, &last_play, sizeof(lp) - 1, 0)) == -1){
+		if(!recv_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
-			exit(-1);	
-		}	
+			exit(-1);
+		}		
 
 		// Aplica a jogada
 		jogapessoa(c_info->game, c_info->game->p_list[c_info->player_id].simb, last_play.row, last_play.col);
@@ -303,7 +309,7 @@ void *client_handler(void *arg){
 		pthread_mutex_unlock(&mutex);	
 	}	
 
-	if((b_sent = send(c_info->socket_id, &last_play, sizeof(lp), 0)) == -1){
+	if(!send_last_play(c_info->socket_id, &last_play)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
@@ -373,4 +379,77 @@ void b_create(g_structure *game){
 // Cria a lista de jogadores
 void p_create(g_structure *game){
 	game->p_list = malloc(sizeof(p_structure) * game->p_num);	
+}
+
+int send_basic_info(int c_socket, cbi *client_basic_info){
+	int aux, b_sent;
+	char aux2;
+
+	// Envia id do jogador
+	aux = htonl(client_basic_info->player_id);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	// Envia tamanho do tabuleiro
+	aux = htonl(client_basic_info->b_size);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	// Envia tamanho da sequencia
+	aux = htonl(client_basic_info->s_size);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	// Envia o caracter do jogador
+	aux2 = client_basic_info->player_symbol;
+	if((b_sent = send(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
+
+	return 1;
+}
+
+int recv_last_play(int c_socket, lp *last_play){
+	int aux, b_recv;
+	char aux2;
+
+	// Recebe as coordenadas da jogada e o simbolo
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	last_play->row = ntohl(aux);
+
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	last_play->col = ntohl(aux);
+
+	if((b_recv = recv(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
+	last_play->symb = aux;
+
+	// Recebe flag se o jogo acabou
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	last_play->end = ntohl(aux);
+
+	// Recebe o proximo jogador
+	if((b_recv = recv(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+	last_play->next_player = ntohl(aux);
+
+	return 1;
+}
+
+int send_last_play(int c_socket, lp *last_play){
+	int aux, b_sent;
+	char aux2;
+
+	// Recebe as coordenadas da jogada e o simbolo
+	aux = htonl(last_play->row);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	aux = htonl(last_play->col);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	aux2 = last_play->symb;
+	if((b_sent = send(c_socket, &aux2, sizeof(char), 0)) == -1) return 0;
+
+	// Recebe flag se o jogo acabou
+	aux = htonl(last_play->end);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	// Recebe o proximo jogador
+	aux = htonl(last_play->next_player);
+	if((b_sent = send(c_socket, &aux, sizeof(int), 0)) == -1) return 0;
+
+	return 1;
 }
