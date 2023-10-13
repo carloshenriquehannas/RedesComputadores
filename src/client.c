@@ -37,7 +37,6 @@ int client(){
 		if(get_lobby_code(ip)){
 
 			// Inicializa a estrutura de endereco do servidor
-			memset(&s_addr, 0, sizeof(s_addr));
 			s_addr.sin_family = AF_INET;
 			s_addr.sin_port = htons(8080);
 			s_addr.sin_addr.s_addr = inet_addr(ip);
@@ -47,6 +46,7 @@ int client(){
 				break;
 			} else {
 				printf("Nao foi possivel conectar ao servidor. Tente novamente.\n");
+			}
 		}
 	}
 	

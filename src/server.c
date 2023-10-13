@@ -70,7 +70,6 @@ int server(){
 	// Configura o endereco do servidor
 	char ip[16];
 	while(!read_ip(ip));
-	memset(&s_addr, 0 , sizeof(s_addr));
 	s_addr.sin_family = AF_INET;
 	s_addr.sin_port = htons(8080);
 	s_addr.sin_addr.s_addr = inet_addr(ip);
@@ -110,7 +109,6 @@ int server(){
 	while(!start && game->p_connected < (game->p_num - 1)){	
 		
 		// Aceita uma nova conexao com um cliente
-		printf("Tentou aceitar\n");
             	c_sockets[game->p_connected] = accept(s_socket, (struct sockaddr *)&c_addr, &c_len);
             	if (c_sockets[game->p_connected] == -1) {
                 	printf("Erro ao aceitar a conexao\n");
