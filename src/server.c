@@ -130,6 +130,7 @@ int server(){
 
                 		// Cria uma nova thread para lidar com o cliente
 				ct_info[game->p_connected].player_id = game->p_connected - 1;
+				ct_info[game->p_connected].socket_id = c_sockets[game->p_connected];
                 		if (pthread_create(&c_threads[game->p_connected], NULL, client_handler, &(ct_info[game->p_connected])) != 0) {
                     			perror("Erro ao criar a thread\n");
 					exit(-1);
@@ -258,8 +259,6 @@ void *client_handler(void *arg){
 	// Informacoes passadas pela thread
 	thread_info *c_info = ((thread_info *) arg);
 	
-	int b_recv, b_sent;
-
 	// atribui um simbolo ao jogador
 	c_info->game->p_list[c_info->player_id].simb = (char) (33 + c_info->player_id);
 
