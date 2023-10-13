@@ -4,6 +4,7 @@
 #include "game_engine.h"
 
 int client();
-void get_lobby_code(char *ip);
+
+int get_lobby_code(char *ip);
 
 #endif
