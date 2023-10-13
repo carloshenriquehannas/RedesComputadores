@@ -112,7 +112,7 @@ int server(){
 	
 	while(!start){	
 		// Aceitar uma conexao
-		int num_events = poll(poll_fds, game->p_connected + 1, 200);
+		int num_events = poll(poll_fds, game->p_num + 1, 200);
         	if (num_events == -1) {
             		perror("poll");
             		exit(EXIT_FAILURE);
@@ -127,9 +127,10 @@ int server(){
                 		printf("Erro ao aceitar a conexao\n");
             		} else {
                 		printf("Jogador conectado! FD: %d\n", c_sockets[game->p_connected]);
+				printf("Para iniciar o jogo, aperte 0\n");
 
                 		// Cria uma nova thread para lidar com o cliente
-				ct_info[game->p_connected].player_id = game->p_connected - 1;
+				ct_info[game->p_connected].player_id = game->p_connected + 1;
 				ct_info[game->p_connected].socket_id = c_sockets[game->p_connected];
                 		if (pthread_create(&c_threads[game->p_connected], NULL, client_handler, &(ct_info[game->p_connected])) != 0) {
                     			perror("Erro ao criar a thread\n");
@@ -272,6 +273,8 @@ void *client_handler(void *arg){
 		exit(-1);
 	}		
 	
+	while(!start);
+
 	printf("Batata\n");
 	
 	while(!c_info->game->g_ended){

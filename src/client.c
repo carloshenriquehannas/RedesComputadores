@@ -58,7 +58,7 @@ int client(){
 		exit(-1);	
 	}
 
-	printf("Tamanho do tabuleiro: %d\nTamanho da sequencia: %d\nSeu caractere: %c\n\n", client_basic_info.b_size, client_basic_info.s_size, client_basic_info.player_symbol);
+	printf("Tamanho do tabuleiro: %d\nTamanho da sequencia: %d\nSeu caractere: '%c'\n\n", client_basic_info.b_size, client_basic_info.s_size, client_basic_info.player_symbol);
 
 	game.b_size = client_basic_info.b_size;
 	game.s_size = client_basic_info.s_size;
