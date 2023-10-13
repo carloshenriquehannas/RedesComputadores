@@ -162,6 +162,7 @@ int server(){
 				game->g_ended = -1;
 			} else {			      // se continua normalmente
 				game->next_player = (game->next_player + 1) % (game->p_connected + 1);  	// atualiza o proximo jogador
+				printf("Prox jogador: %d\n", game->next_player);
 				last_play.next_player = game->next_player;
 				processed = 1;				// define a informacao como processada
 			}
@@ -211,10 +212,10 @@ void *host_handler(void *arg){
 			break;
 		}
 	}
+	mostra(h_info->game);
 	
 	while(!h_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
-		printf("Mostrou uma vez!\n");
 		
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((h_info->game->next_player != h_info->player_id || !processed) && !h_info->game->g_ended){
@@ -288,7 +289,6 @@ void *client_handler(void *arg){
 		pthread_mutex_lock(&mutex);
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((c_info->game->next_player != c_info->player_id || !processed) && !c_info->game->g_ended){
-			printf("Batata\n");
 			// Envia a ultima jogada ao cliente
 			if(!send_last_play(c_info->socket_id, &last_play)){
 				printf("Erro de comunicacao!\n");
@@ -300,7 +300,6 @@ void *client_handler(void *arg){
 		// Confere se o jogo nao acabou enquanto esperava pela condicao
 		if(c_info->game->g_ended) break;
 
-		printf("Passou aqui client\n");
 		// Avisa o usuario que eh a vez dele jogar
 		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
