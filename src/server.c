@@ -4,6 +4,7 @@
 #include<pthread.h>
 #include<sys/socket.h>
 #include<netinet/in.h>
+#include<arpa/inet.h>
 #include<unistd.h>
 #include<poll.h>
 
@@ -85,7 +86,7 @@ int server(){
 		exit(EXIT_FAILURE);
 	}	
 
-	printf("Sala criada! O codigo seu ip eh: TODO\n");
+	printf("Sala criada!\n");
 
 	poll_fds[0].fd = s_socket;
     	poll_fds[0].events = POLLIN;
