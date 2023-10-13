@@ -263,12 +263,14 @@ void *client_handler(void *arg){
 
 	client_basic_info.player_id = c_info->player_id;
 	client_basic_info.player_symbol = (33 + c_info->player_id);
+	printf("%d\n", c_info->player_id);
 
 	if((b_sent = send(c_info->socket_id, &client_basic_info, sizeof(cbi), 0)) == -1){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
 	
+	printf("Batata\n");
 	
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
