@@ -87,13 +87,16 @@ int server(){
 	}	
 
 	printf("Sala criada!\n");
-
+	
+	// define o socket do servidor como o descritor que o poll vai cuidar
 	poll_fds[0].fd = s_socket;
     	poll_fds[0].events = POLLIN;
 
+	// declara as threads do host e dos clientes
 	pthread_t h_thread;
 	pthread_t c_threads[game->p_num - 1];
 
+	// inicializa as informacoes passadas para as threads
 	thread_info ht_info;
 	ht_info.game = game;
 	ht_info.socket_id = -1;
@@ -142,13 +145,13 @@ int server(){
 		if(!processed){
 
 			// Faz as verificacoes relativas a jogada atual	
-			if(win(game, last_play.symb)){
+			if(win(game, last_play.symb)){        // se ganhou
 				last_play.end = 1;
 				game->g_ended = 1;
-			} else if (empatou(game)){
+			} else if (empatou(game)){            // se o jogo chegou a um empate
 				last_play.end = -1;
 				game->g_ended = -1;
-			} else {		
+			} else {			      // se continua normalmente
 				game->next_player = (game->next_player + 1) % (game->p_connected + 1);  	// atualiza o proximo jogador
 				last_play.next_player = game->next_player;
 				processed = 1;				// define a informacao como processada
@@ -158,16 +161,20 @@ int server(){
 		pthread_mutex_unlock(&mutex);	
 	}
 	
+	// espera todas as threads terminarem o processamento
 	pthread_join(h_thread, NULL);
 	for(int i = 0; i <  game->p_connected; i++){
 		pthread_join(c_threads[i], NULL);
 	}
 	
+	// fecha os sockets
 	close(s_socket);
 	for(int i = 0; i < game->p_connected; i++){
 		close(c_sockets[i]);
 	}
+	close(s_socket);
 
+	// libera memorias alocadas
 	for(int i = 0; i < game->b_size; i++){
 		free(game->board[i]);
 	}
@@ -178,6 +185,7 @@ int server(){
 	return 0;
 }
 
+// Thread do host
 void *host_handler(void *arg){
 	thread_info *h_info = ((thread_info *) arg);
 
@@ -245,6 +253,7 @@ void *host_handler(void *arg){
 	return NULL;	
 }
 
+// Thread do cliente
 void *client_handler(void *arg){
 	thread_info *c_info = ((thread_info *) arg);
 	
@@ -299,9 +308,7 @@ void *client_handler(void *arg){
 	return NULL;
 }	
 	
-
-
-
+// Funcao para receber do teclado o tamanho do tabuleiro
 void get_b_size(g_structure *game){
     	printf("\nDIMENSAO DO TABULEIRO\n");
     	printf("Digite a dimensao N do tabuleiro. Exemplo: para N = 3, digite o numero 3. Obs: a dimensao deve ser maior que 2\n");
@@ -316,6 +323,7 @@ void get_b_size(g_structure *game){
 
 }
 
+// Funcao para receber do teclado o tamanho da sequencia de vitoria
 void get_s_size(g_structure *game){	
     	printf("\nSEQUENCIA DO VENCEDOR\n");
     	printf("Digite a sequencia  que define um vencedor. Exemplo: para P = 3, digite o numero 3.\n");
@@ -329,6 +337,7 @@ void get_s_size(g_structure *game){
     	printf("\n-> Tamanho de sequencia escolhido: %d\n\n", game->s_size);
 }
 
+// Funcao para receber do teclado o numero de jogadores maximo na sala
 void get_p_num(g_structure *game){
     	printf("\nQUANTIDADE DE JOGADORES\n");
     	printf("Digite a quantidade de jogadores. Exemplo: para 5 jogadores, digite o numero 5.\n");
@@ -342,6 +351,7 @@ void get_p_num(g_structure *game){
     	printf("\n-> Numero de jogadores selecionados: %d\n\n", game->p_num);
 }
 
+// Cria um tabuleiro e inicializa ele vazio
 void b_create(g_structure *game){
 	game->board = malloc(sizeof(char *) * game->b_size);
 	for(int i = 0; i < game->b_size; i++){
@@ -358,6 +368,7 @@ void b_create(g_structure *game){
 	game->g_ended = 0;
 }
 
+// Cria a lista de jogadores
 void p_create(g_structure *game){
 	game->p_list = malloc(sizeof(p_structure) * game->p_num);	
 }
