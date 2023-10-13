@@ -51,9 +51,16 @@ int server(){
 
 	int s_socket, c_sockets[game->p_num]; 					// define os sockets
 
+	// zera as variaveis globais
 	memset(&last_play, 0, sizeof(lp));
 	memset(&client_basic_info, 0, sizeof(cbi));
 
+	// inicializa a variabel last_play
+	last_play.row = 1;
+	last_play.row = 1;
+	last_play.symb = '-';
+
+	// passa as dimensoes do tabuleiro para struct de infos do cliente
 	client_basic_info.b_size = game->b_size;
 	client_basic_info.s_size = game->s_size;
 
