@@ -326,6 +326,7 @@ void *client_handler(void *arg){
 		processed = 0;
 		pthread_mutex_unlock(&mutex);	
 	}	
+	printf("Tentou mandar que acabou\n");
 
 	if(!send_last_play(c_info->socket_id, &last_play)){
 		printf("Erro de comunicacao!\n");

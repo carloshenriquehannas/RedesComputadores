@@ -75,7 +75,7 @@ int client(){
 
 		// Se for a vez do jogador
 		printf("Proximo: %d\nMeu id: %d\n", last_play.next_player, client_basic_info.player_id);
-		if(last_play.next_player == client_basic_info.player_id && !last_play.end){
+		if(last_play.next_player == client_basic_info.player_id && last_play.end == 0){
 			// Avisa o usuario que eh a vez dele jogar
 			if(!recv_last_play(c_socket, &last_play)){
 				printf("Erro de comunicacao!\n");
@@ -101,13 +101,10 @@ int client(){
 				printf("Erro de comunicacao!\n");
 				exit(-1);		
 			}
+			last_play.next_player++;
 		}
 	}
-
-	if(!recv_last_play(c_socket, &last_play)){
-		printf("Erro de comunicacao!\n");
-		exit(-1);
-	}
+	printf("Chegou aqui!\n");
 
 	switch(last_play.end){
                  case 1:
