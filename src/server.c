@@ -112,7 +112,7 @@ int server(){
 	
 	while(!start){	
 		// Aceitar uma conexao
-		int num_events = poll(poll_fds, game->p_connected + 1, 200);
+		int num_events = poll(poll_fds, game->p_connected + 1, 0);
         	if (num_events == -1) {
             		perror("poll");
             		exit(EXIT_FAILURE);
