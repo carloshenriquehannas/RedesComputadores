@@ -161,8 +161,6 @@ int server(){
 				last_play.end = -1;
 				game->g_ended = -1;
 			} else {			      // se continua normalmente
-				game->next_player = (game->next_player + 1) % (game->p_connected + 1);  	// atualiza o proximo jogador
-				last_play.next_player = game->next_player;
 				processed = 1;				// define a informacao como processada
 			}
 			pthread_cond_broadcast(&cond); 					// avisa os clientes que as informacoes foram processadas
@@ -243,6 +241,9 @@ void *host_handler(void *arg){
 		last_play.row = row;
 		last_play.symb = h_info->game->p_list[h_info->player_id].simb;
 
+		h_info->game->next_player = (h_info->game->next_player + 1) % (h_info->game->p_connected + 1);  	// atualiza o proximo jogador
+		last_play.next_player = h_info->game->next_player;
+
 		processed = 0;
 		pthread_mutex_unlock(&mutex);	
 	}	
@@ -318,6 +319,9 @@ void *client_handler(void *arg){
 
 		// Aplica a jogada
 		jogapessoa(c_info->game, c_info->game->p_list[c_info->player_id].simb, last_play.row, last_play.col);
+
+		c_info->game->next_player = (c_info->game->next_player + 1) % (c_info->game->p_connected + 1);  	// atualiza o proximo jogador
+		last_play.next_player = c_info->game->next_player;
 
 		processed = 0;
 		pthread_mutex_unlock(&mutex);	
