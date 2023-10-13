@@ -35,12 +35,17 @@ int client(){
 
 		// Conecta ao servidor
 		if(connect(c_socket, (struct sockaddr *)&s_addr, sizeof(s_addr)) != -1){
-			free(ip);
 			break;
 		} else {
 			printf("\nNao foi possivel conectar a sala. Verifique o codigo e tente novamente.\n");
 		}
 	}
+	
+	printf("Voce entrou na sala.\n");
+
+
+
+	//if(b_recv = recv(
 
 
 
@@ -48,20 +53,6 @@ int client(){
 }
 
 void get_lobby_code(char *ip){
-	char aux[1024];
-	printf("Digite o codigo da sala: ");
-	fgets(aux, sizeof(aux),stdin);
-	int i = 0, j = 0;
-	while(i < strlen(aux) - 5){ 
-		ip[j] = aux[i];
-		i++;
-		j++;
-		if((i+1) % 3 == 0){
-			j++;
-			ip[j] = '.';
-		}
-		i++;
-		j++;
-	}
-	ip[j] = '\0'; 
+	printf("Digite o ip do hospedeiro: ");
+	fgets(ip, sizeof(ip),stdin);
 }

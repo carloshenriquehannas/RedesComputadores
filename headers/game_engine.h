@@ -19,6 +19,20 @@ typedef struct {
 	int next_player;        // proximo a jogar
 } g_structure;
 
+// variavel que representa a ultima jogada a ser comunicada
+typedef struct {
+	int row;
+	int col;
+	char symb;
+	int end;
+} lp;
+
+// variavel para compartilhar informacoes basicas com o cliente
+typedef struct{
+	int player_id;
+	char player_symbol;
+} cbi;
+
 // Funcao que testa se o jogador com o caracter 'x' venceu
 int win(g_structure *game, char x);
 
@@ -32,7 +46,7 @@ int chances(g_structure *game, char x, int i, int j);
 int mostra(g_structure *game);
 
 // Funcao que faz a jogada do usuario
-int jogapessoa(g_structure *game, char x);
+int jogapessoa(g_structure *game, char x, int row, int col);
 
 // Funcao caso nao haja um vencedor, i.e, partida deu velha
 int empatou(g_structure *game);

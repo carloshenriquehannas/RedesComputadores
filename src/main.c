@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[]){
 
-	char str[1024];
+	int aux;
 
 	while(1){	
     		printf("\nJOGO DA VELHA++\n");
@@ -20,8 +20,8 @@ int main(int argc, char *argv[]){
     		printf("\n\n 3 - Sair do jogo\n\n");
 
 		while(1){
-			fgets(str, sizeof(str), stdin);
-			switch(atoi(str)){
+			scanf("%d", &aux);
+			switch(aux){
 				case 1:
 					server();
 					break;
@@ -40,13 +40,4 @@ int main(int argc, char *argv[]){
 			}
 		}
 	}
-
-    // Explicação do modo de jogar
-    printf("\nMODO DE JOGAR\n");
-    printf("Apos aparecer o tabuleiro, basta digitar a letra que representa a coluna e, em seguida, o numero que corresponde a linha em que quer jogar. Pressione ENTER no fim\n");
-    printf("Exemplo: para jogar na primeira coluna e segunda linha, digite A2");
-
-    // Começar o jogo
-    printf("\n\n-TUDO PRONTO, O JOGO COMECOU!-\n\n");
-
 }

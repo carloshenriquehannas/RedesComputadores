@@ -232,25 +232,13 @@ int mostra(g_structure *game){
 }
 
 //Funcao que faz a jogada do usuario
-int jogapessoa(g_structure *game, char x){
+int jogapessoa(g_structure *game, char x, int row, int col){
         
-	int l = 5;
-        char c;
-
-        printf("Digite a letra da coluna, em seguida o numero da linha.\n");
-        printf("Digite aqui: ");
-        do {
-		scanf("\n%c%d", &c,&l); //Coluna em que vai jogar
-            	c = toupper(c); //Letra que representa a coluna em maiusculo, independente da entrada
-            	if(c < 'A' || c > 'A' + (game->b_size - 1) || l > game->b_size){
-                	printf("Posicao %c,%d invalida. Jogue novamente: ", c,l);
-	    	} else if (game->board[l - 1][c - 'A'] == '-') {
-                	game->board[l - 1][c - 'A'] = x;
-                	return 0;
-            	}
-        } while(l < 'A' || l > 'A' + (x - 1) || c > x);
-        
-	return 1;
+	if(row > 0 && col > 0 && row <= game->b_size && col <= game->b_size && game->board[row - 1][col - 1] == '-'){
+		game->board[row - 1][col - 1] = x;
+		return 0;	
+	}
+       	return -1;
 }
 
 //Funcao caso nao haja um vencedor, i.e, partida deu velha
