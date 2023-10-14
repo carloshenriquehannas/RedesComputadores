@@ -301,6 +301,7 @@ void *client_handler(void *arg){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}		
+		printf("%d\n", last_play.end);
 
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((c_info->game->next_player != c_info->player_id || !processed) && !last_play.end){
