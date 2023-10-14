@@ -68,17 +68,16 @@ int client(){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}	
-		printf("Recebeu info\n");
 
 		game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
 		mostra(&game);
 		
 
 		// Se for a vez do jogador
-		printf("Proximo: %d\nMeu id: %d\nAcabou: %d\n", last_play.next_player, client_basic_info.player_id, last_play.end);
+		printf("\nProximo: %d\nMeu id: %d\n", last_play.next_player, client_basic_info.player_id);
 		if(last_play.next_player == client_basic_info.player_id && last_play.end == 0){
 			// Avisa o usuario que eh a vez dele jogar
-			printf("Eh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
+			printf("\nEh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
 
 			// Recebe a jogada do usuario (jah validada)
 	            	int row, col;
@@ -98,17 +97,16 @@ int client(){
 				printf("Erro de comunicacao!\n");
 				exit(-1);		
 			}
-			printf("Enviou info\n");
 			last_play.next_player++;
 		}
 	}
-	printf("Chegou aqui!\n");
-
 	switch(last_play.end){
                  case 1:
                          printf("Jogador %c venceu!\n", last_play.symb);
+			 break;
                  case -1:
                          printf("Empate!\n");
+			 break;
          }
 
 	return 0;

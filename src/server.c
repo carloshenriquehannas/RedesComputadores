@@ -133,7 +133,7 @@ int server(){
             		if (c_sockets[game->p_connected] == -1) {
                 		printf("Erro ao aceitar a conexao\n");
             		} else {
-                		printf("Jogador conectado! FD: %d\n", c_sockets[game->p_connected]);
+                		printf("Jogador conectado!\n");
 				printf("Para iniciar o jogo, aperte 0\n");
 
                 		// Cria uma nova thread para lidar com o cliente
@@ -160,18 +160,19 @@ int server(){
 			} else if (empatou(game)){            // se o jogo chegou a um empate
 				last_play.end = -1;
 				game->g_ended = -1;
-			} else {			      // se continua normalmente
-				processed = 1;				// define a informacao como processada
-			}
+				
+			}			      // se continua normalmente
+			processed = 1;				// define a informacao como processada
+			
 			pthread_cond_broadcast(&cond); 					// avisa os clientes que as informacoes foram processadas
 		}
 		pthread_mutex_unlock(&mutex);	
 	}
 	
 	for(int i = 0; i < game->p_connected + 1; i++) pthread_cond_broadcast(&cond);
+
 	// espera todas as threads terminarem o processamento
 	pthread_join(h_thread, NULL);
-	printf("Esperou thread do server\n");
 	for(int i = 0; i <  game->p_connected; i++){
 		pthread_join(c_threads[i], NULL);
 	}
@@ -292,26 +293,24 @@ void *client_handler(void *arg){
 	
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
-		printf("Recomecou o loop\n");
+
 		// Envia o tabuleiro atualizado
 		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}		
-		printf("Enviou info 1\n");
+
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((c_info->game->next_player != c_info->player_id || !processed) && !last_play.end){
-			printf("Entrou na espera\n");
+
 			// Espera a condicao ser atingida
 			pthread_cond_wait(&cond, &mutex);
-			printf("Ela volta aqui\n");
 
 			// Envia a ultima jogada ao cliente
 			if(!send_last_play(c_info->socket_id, &last_play)){
 				printf("Erro de comunicacao!\n");
 				exit(-1);
 			}		
-			printf("Enviou info 2\n");
 		}
 		// Confere se o jogo nao acabou enquanto esperava pela condicao
 		if(last_play.end != 0) break;
@@ -321,7 +320,6 @@ void *client_handler(void *arg){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}		
-		printf("Recebeu info\n");
 
 		// Aplica a jogada
 		jogapessoa(c_info->game, c_info->game->p_list[c_info->player_id].simb, last_play.row, last_play.col);
@@ -332,14 +330,12 @@ void *client_handler(void *arg){
 		processed = 0;
 		pthread_mutex_unlock(&mutex);	
 	}	
-	printf("Tentou mandar que acabou\n");
 
 	if(!send_last_play(c_info->socket_id, &last_play)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}
-	printf("Enviou info 4\n");
-	return NULL;
+	return 0;
 }	
 	
 // Funcao para receber do teclado o tamanho do tabuleiro
