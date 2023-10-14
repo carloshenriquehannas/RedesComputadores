@@ -168,8 +168,10 @@ int server(){
 		pthread_mutex_unlock(&mutex);	
 	}
 	
+	for(int i = 0; i < game->p_connected + 1; i++) pthread_cond_broadcast(&cond);
 	// espera todas as threads terminarem o processamento
 	pthread_join(h_thread, NULL);
+	printf("Esperou thread do server\n");
 	for(int i = 0; i <  game->p_connected; i++){
 		pthread_join(c_threads[i], NULL);
 	}
@@ -302,6 +304,7 @@ void *client_handler(void *arg){
 			printf("Entrou na espera\n");
 			// Espera a condicao ser atingida
 			pthread_cond_wait(&cond, &mutex);
+			printf("Ela volta aqui\n");
 
 			// Envia a ultima jogada ao cliente
 			if(!send_last_play(c_info->socket_id, &last_play)){
