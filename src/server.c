@@ -216,13 +216,15 @@ void *host_handler(void *arg){
 	while(!h_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 		
+		mostra(h_info->game);
+
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
-		while((h_info->game->next_player != h_info->player_id || !processed) && !h_info->game->g_ended){
+		while((h_info->game->next_player != h_info->player_id || !processed) && last_play.end == 0){
 
 			pthread_cond_wait(&cond, &mutex);
 			mostra(h_info->game);
 		}
-		if(h_info->game->g_ended) break;
+		if(last_play.end != 0) break;
 
 		// Avisa o usuario que eh a vez dele jogar
 		printf("Eh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
@@ -335,6 +337,7 @@ void *client_handler(void *arg){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}
+	printf("Enviou os dados!\n");
 	return 0;
 }	
 	

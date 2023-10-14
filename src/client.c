@@ -100,6 +100,11 @@ int client(){
 			last_play.next_player++;
 		}
 	}
+	if(!recv_last_play(c_socket, &last_play)){
+		printf("Erro de comunicacao!\n");
+		exit(-1);
+	}
+	mostra(&game);	
 	switch(last_play.end){
                  case 1:
                          printf("Jogador %c venceu!\n", last_play.symb);
