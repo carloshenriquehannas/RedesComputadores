@@ -296,7 +296,7 @@ void *client_handler(void *arg){
 	}		
 
 	// logica de controle da comunicacao
-	while(!c_info->game->g_ended){
+	while(!last_play.end){
 		pthread_mutex_lock(&mutex);
 		// Envia o tabuleiro atualizado
 		if(!send_last_play(c_info->socket_id, &last_play)){

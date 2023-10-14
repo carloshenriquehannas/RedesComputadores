@@ -72,6 +72,8 @@ int client(){
 		if (last_player != last_play.next_player){
 			last_player = last_play.next_player;
 		}else {
+			game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
+			mostra(&game);
 			continue;
 		}
 
