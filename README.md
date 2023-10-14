@@ -1,6 +1,9 @@
 # Redes de Computadores
 Trabalho prático 1 de Redes de Computadores: Jogo da Velha++
 
+## Videos
+https://drive.google.com/drive/folders/17f2ectBrZWSjGpSaerwnslMS36dQU6Vd?usp=drive_link
+
 ## Descrição do jogo
 O Jogo da Velha++ é um game em que você define o modo de jogar o jogo da velha - é uma expansão do jogo da velha clássico. Inicialmente você deverá configurar a sua maneira de jogo, i.e, tamanho de tabuleiro, tamanho de sequência que define um vencedor, quantos jogadores irão jogar e se algum deles será controlado ou não por uma máquina virtual.
 
