@@ -92,12 +92,12 @@ int client(){
 			last_play.row = row;
 			last_play.col = col;
 			last_play.symb = client_basic_info.player_symbol;
+			last_play.next_player++;
 
 			if(!send_last_play(c_socket, &last_play)){
 				printf("Erro de comunicacao!\n");
 				exit(-1);		
 			}
-			last_play.next_player++;
 			printf("%d\n", last_play.next_player);
 		}
 	}
