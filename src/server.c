@@ -215,7 +215,6 @@ void *host_handler(void *arg){
 	
 	while(!last_play.end){
 		pthread_mutex_lock(&mutex);
-		sleep(2);
 		mostra(h_info->game);
 
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
@@ -299,7 +298,6 @@ void *client_handler(void *arg){
 	// logica de controle da comunicacao
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
-		sleep(2);
 		// Envia o tabuleiro atualizado
 		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
@@ -344,7 +342,6 @@ void *client_handler(void *arg){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}
-	printf("Enviou os dados!\n");
 	return 0;
 }	
 	
