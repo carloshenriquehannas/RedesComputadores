@@ -298,6 +298,7 @@ void *client_handler(void *arg){
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 		sleep(2);
+		printf("Id last_player: %d\n", last_play.next_player);
 		// Envia o tabuleiro atualizado
 		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");

@@ -50,6 +50,7 @@ int client(){
 	
 	printf("Voce entrou na sala.\n");
 
+	int last_player = -1;
 
 	if(!recv_basic_info(c_socket, &client_basic_info)){
 		printf("Erro de comunicaco com o servidor!\n");
@@ -67,7 +68,12 @@ int client(){
 		if(!recv_last_play(c_socket, &last_play)){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
-		}	
+		}
+		if (last_player != last_play.next_player){
+			last_player = last_play.next_player;
+		}else {
+			continue;
+		}
 
 		game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
 		mostra(&game);
@@ -92,6 +98,7 @@ int client(){
 			last_play.row = row;
 			last_play.col = col;
 			last_play.symb = client_basic_info.player_symbol;
+			last_player = client_basic_info.player_id;
 			last_play.next_player++;
 
 			if(!send_last_play(c_socket, &last_play)){
