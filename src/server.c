@@ -291,8 +291,14 @@ void *client_handler(void *arg){
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 		printf("Recomecou o loop\n");
+		// Envia o tabuleiro atualizado
+		if(!send_last_play(c_info->socket_id, &last_play)){
+			printf("Erro de comunicacao!\n");
+			exit(-1);
+		}		
+		printf("Enviou info 1\n");
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
-		while((c_info->game->next_player != c_info->player_id || !processed) && !c_info->game->g_ended){
+		while((c_info->game->next_player != c_info->player_id || !processed) && !last_play.end){
 			printf("Entrou na espera\n");
 			// Espera a condicao ser atingida
 			pthread_cond_wait(&cond, &mutex);
@@ -305,13 +311,8 @@ void *client_handler(void *arg){
 			printf("Enviou info 2\n");
 		}
 		// Confere se o jogo nao acabou enquanto esperava pela condicao
-		if(c_info->game->g_ended != 0) break;
+		if(last_play.end != 0) break;
 
-		// Envia o tabuleiro atualizado
-		if(!send_last_play(c_info->socket_id, &last_play)){
-			printf("Erro de comunicacao!\n");
-			exit(-1);
-		}		
 		// Recebe a jogada do usuario (jah validada)
 		if(!recv_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
