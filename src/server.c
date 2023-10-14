@@ -281,18 +281,20 @@ void *client_handler(void *arg){
 	client_basic_info.player_symbol = (33 + c_info->player_id);
 	printf("%d\n", c_info->player_id);
 
+	// envia as informacoes basicas
 	if(!send_basic_info(c_info->socket_id, &client_basic_info)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
-	
+	// espera o comeco do jogo
 	while(!start);
+	// inicializa a ultima jogada
 	if(!send_last_play(c_info->socket_id, &last_play)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
 	}		
 
-	
+	// logica de controle da comunicacao
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 
