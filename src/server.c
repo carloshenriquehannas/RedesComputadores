@@ -157,9 +157,11 @@ int server(){
 			if(win(game, last_play.symb)){        // se ganhou
 				last_play.end = 1;
 				game->g_ended = 1;
+				last_play.next_player = -1;
 			} else if (empatou(game)){            // se o jogo chegou a um empate
 				last_play.end = -1;
 				game->g_ended = -1;
+				last_play.next_player = -1;
 				
 			}			      // se continua normalmente
 			processed = 1;				// define a informacao como processada
@@ -169,8 +171,6 @@ int server(){
 		pthread_mutex_unlock(&mutex);	
 	}
 	
-	for(int i = 0; i < game->p_connected + 1; i++) pthread_cond_broadcast(&cond);
-
 	// espera todas as threads terminarem o processamento
 	pthread_join(h_thread, NULL);
 	for(int i = 0; i <  game->p_connected; i++){
@@ -213,18 +213,20 @@ void *host_handler(void *arg){
 		}
 	}
 	
-	while(!h_info->game->g_ended){
+	while(!last_play.end){
 		pthread_mutex_lock(&mutex);
 		sleep(2);
 		mostra(h_info->game);
 
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((h_info->game->next_player != h_info->player_id || !processed) && last_play.end == 0){
-
 			pthread_cond_wait(&cond, &mutex);
 			mostra(h_info->game);
 		}
-		if(last_play.end != 0) break;
+		if(last_play.end != 0){ 
+			pthread_mutex_unlock(&mutex);
+			break;
+		}
 
 		// Avisa o usuario que eh a vez dele jogar
 		printf("Eh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
@@ -298,13 +300,11 @@ void *client_handler(void *arg){
 	while(!c_info->game->g_ended){
 		pthread_mutex_lock(&mutex);
 		sleep(2);
-		printf("Id last_player: %d\n", last_play.next_player);
 		// Envia o tabuleiro atualizado
 		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}		
-		printf("%d\n", last_play.end);
 
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((c_info->game->next_player != c_info->player_id || !processed) && !last_play.end){
@@ -319,7 +319,10 @@ void *client_handler(void *arg){
 			}		
 		}
 		// Confere se o jogo nao acabou enquanto esperava pela condicao
-		if(last_play.end != 0) break;
+		if(last_play.end != 0){ 
+			pthread_mutex_unlock(&mutex);	
+			break;
+		}
 
 		// Recebe a jogada do usuario (jah validada)
 		if(!recv_last_play(c_info->socket_id, &last_play)){
@@ -330,7 +333,7 @@ void *client_handler(void *arg){
 		// Aplica a jogada
 		jogapessoa(c_info->game, c_info->game->p_list[c_info->player_id].simb, last_play.row, last_play.col);
 
-		c_info->game->next_player = (c_info->game->next_player ) % (c_info->game->p_connected + 1);  	// atualiza o proximo jogador
+		c_info->game->next_player = last_play.next_player % (c_info->game->p_connected + 1);  	// atualiza o proximo jogador
 		last_play.next_player = c_info->game->next_player;
 
 		processed = 0;
