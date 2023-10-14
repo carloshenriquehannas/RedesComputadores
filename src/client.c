@@ -11,13 +11,16 @@
 #include "../headers/server.h"
 
 int client(){
+	// estruturas de socket
 	int c_socket;
 	struct sockaddr_in s_addr;
 
+	// estrutura do jogo
 	g_structure game;
 	
-	cbi client_basic_info;
-	lp last_play;
+	// pacotes de informacao transmitidos/recebidos
+	cbi client_basic_info; 				// pacote de configuracao inicial
+	lp last_play; 					// pacote de troca de mensagens sobre o jogo
 
 	memset(&client_basic_info, 0, sizeof(cbi));
 	memset(&last_play, 0, sizeof(lp));
@@ -47,39 +50,48 @@ int client(){
 			}
 		}
 	}
-	
-	printf("Voce entrou na sala.\n");
 
+	// Conexao estabelecida
+	printf("\nVoce entrou na sala.\n");
+
+	// Define que nao houve um ultimo jogador (ainda)
 	int last_player = -1;
 
+	// Recebe as informacoes basicas sobre o jogo
 	if(!recv_basic_info(c_socket, &client_basic_info)){
 		printf("Erro de comunicaco com o servidor!\n");
 		exit(-1);	
 	}
 
-	printf("Tamanho do tabuleiro: %d\nTamanho da sequencia: %d\nSeu caractere: '%c'\n\n", client_basic_info.b_size, client_basic_info.s_size, client_basic_info.player_symbol);
+	// Imprime as informacoes basicas
+	printf("\n\nTamanho do tabuleiro: %d\nTamanho da sequencia: %d\nSeu caractere: '%c'\n\n", client_basic_info.b_size, client_basic_info.s_size, client_basic_info.player_symbol);
 
+	// atualiza as informacoes internas com as recebidas
 	game.b_size = client_basic_info.b_size;
 	game.s_size = client_basic_info.s_size;
 
+	// cria o tabuleiro
 	b_create(&game);	
 
+	// Logica de comunicacao com o servidor
+	// Enquanto o jogo nao acabar
 	while(!last_play.end){
+		// Recebe a ultima jogada feita
 		if(!recv_last_play(c_socket, &last_play)){
 			printf("Erro de comunicacao!\n");
 			exit(-1);
 		}
+
+		// aplica as jogadas 
+		game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
+		mostra(&game);
+
+		// Elimina pacotes inconsistentes/antigos que estavam no backlog
 		if (last_player != last_play.next_player){
 			last_player = last_play.next_player;
 		}else {
-			game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
-			mostra(&game);
 			continue;
 		}
-
-		game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
-		mostra(&game);
-		
 
 		// Se for a vez do jogador
 		if(last_play.next_player == client_basic_info.player_id && last_play.end == 0){
@@ -95,22 +107,28 @@ int client(){
                            	}
                            	printf("Jogada invalida!\n");
 			}
-
+			
+			// Atualiza a ultima jogada
 			last_play.row = row;
 			last_play.col = col;
 			last_play.symb = client_basic_info.player_symbol;
 			last_play.next_player++;
 
+			// Envia a jogada feita
 			if(!send_last_play(c_socket, &last_play)){
 				printf("Erro de comunicacao!\n");
 				exit(-1);		
 			}
-			printf("%d\n", last_play.next_player);
 		}
 	}
+	// teste ao fim de jogo se o jogador ganhou ou perdeu
 	switch(last_play.end){
                  case 1:
-                         printf("Jogador %c venceu!\n", last_play.symb);
+                         if(last_play.symb == client_basic_info.player_symbol){
+				printf("\n Voce venceu! Parabens!\n");	 
+			 }else{
+				 printf("\nVoce perdeu! Jogador %c venceu!\n", last_play.symb);
+			 }
 			 break;
                  case -1:
                          printf("Empate!\n");
@@ -120,12 +138,16 @@ int client(){
 	return 0;
 }
 
+// Funcao para ler o ip da entrada padrao
 int get_lobby_code(char *ip){
 	char input[100];
 
     	printf("Digite o endereco de IP: ");
-	fgets(input, sizeof(input) - 1, stdin);
+	do{
+		fgets(input, sizeof(input) - 1, stdin);
+	} while(strlen(input)< 3);
 
+	// Faz o tratamento para substituir o '\n' pelo '\0'
 	int i = 0;
 	while(input[i] != '\n'){
 		ip[i] = input[i];
@@ -138,6 +160,7 @@ int get_lobby_code(char *ip){
 	return 0;
 }
 
+// Funcao para receber as informacoes basicas pelo socket
 int recv_basic_info(int c_socket, cbi *client_basic_info){
 	int b_recv;
 	char aux[sizeof(cbi)];

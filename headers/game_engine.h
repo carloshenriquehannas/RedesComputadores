@@ -21,19 +21,19 @@ typedef struct {
 
 // variavel que representa a ultima jogada a ser comunicada
 typedef struct {
-	int row;
-	int col;
-	char symb;
-	int end;
-	int next_player;
+	int row; 		// linha
+	int col; 		// coluna
+	char symb; 		// simbolo do jogador que fez a jogada
+	int end; 		// flag que indica se o jogo terminou
+	int next_player; 	// proximo jogador
 } lp;
 
 // variavel para compartilhar informacoes basicas com o cliente
 typedef struct{
-	int player_id;
-	char player_symbol;
-	int b_size;
-	int s_size;
+	int player_id;   	// id do jogador
+	char player_symbol; 	// simbolo do jogador
+	int b_size; 		// tamanho do tabuleiro
+	int s_size; 		// tamanho da sequencia
 } cbi;
 
 // Funcao que testa se o jogador com o caracter 'x' venceu

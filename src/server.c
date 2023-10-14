@@ -133,8 +133,8 @@ int server(){
             		if (c_sockets[game->p_connected] == -1) {
                 		printf("Erro ao aceitar a conexao\n");
             		} else {
-                		printf("Jogador conectado!\n");
-				printf("Para iniciar o jogo, aperte 0\n");
+                		printf("\nJogador conectado!\n");
+				printf("\nPara iniciar o jogo, aperte 0\n");
 
                 		// Cria uma nova thread para lidar com o cliente
 				ct_info[game->p_connected].player_id = game->p_connected + 1;
@@ -149,8 +149,11 @@ int server(){
 		}
 	}
 	
+	// enquanto o jogo ainda nao acabou
 	while(!game->g_ended){
+		// entra na zona critica
 		pthread_mutex_lock(&mutex);
+		// se a informacao ainda nao tiver sido processada
 		if(!processed){
 
 			// Faz as verificacoes relativas a jogada atual	
@@ -169,6 +172,7 @@ int server(){
 			pthread_cond_broadcast(&cond); 					// avisa os clientes que as informacoes foram processadas
 		}
 		pthread_mutex_unlock(&mutex);	
+		// saindo da zona critica
 	}
 	
 	// espera todas as threads terminarem o processamento
@@ -178,7 +182,6 @@ int server(){
 	}
 	
 	// fecha os sockets
-	close(s_socket);
 	for(int i = 0; i < game->p_connected; i++){
 		close(c_sockets[i]);
 	}
@@ -197,13 +200,15 @@ int server(){
 
 // Thread do host
 void *host_handler(void *arg){
-	thread_info *h_info = ((thread_info *) arg);
+	thread_info *h_info = ((thread_info *) arg);   				// informacoes basicas do host
 
+	// atribui dentro da thread o simbolo do host
 	h_info->game->p_list[0].simb = (33 + h_info->player_id);
-	printf("Seu caracter eh: '%c'\n\n", h_info->game->p_list[0].simb);
+	printf("\nSeu caracter eh: '%c'\n\n", h_info->game->p_list[0].simb);
 	
 
-	printf("Para iniciar o jogo, aperte 0\n");
+	// Espera o jogador digitar '0' pra comecar o jogo
+	printf("\nPara iniciar o jogo, aperte 0\n");
 	while(1){
 		int aux;
 		scanf("%d", &aux);
@@ -213,16 +218,26 @@ void *host_handler(void *arg){
 		}
 	}
 	
+	// Logica de controle da thread
+	// Enquanto o jogo nao terminar
 	while(!last_play.end){
+		// entra na zona critica
 		pthread_mutex_lock(&mutex);
+
+		// mostra as informacoes do jogador
 		mostra(h_info->game);
 
 		// O tabuleiro eh exibido enquanto nao for a vez do jogador jogar
 		while((h_info->game->next_player != h_info->player_id || !processed) && last_play.end == 0){
+			// poem em espera pela condicao
 			pthread_cond_wait(&cond, &mutex);
+
+			// assim que volta da espera, exibe a atualizacao do tabuleiro
 			mostra(h_info->game);
 		}
+		// se o jogo tiver acabado
 		if(last_play.end != 0){ 
+			// libera o mutex e sai do loop
 			pthread_mutex_unlock(&mutex);
 			break;
 		}
@@ -234,6 +249,7 @@ void *host_handler(void *arg){
 		int row, col;
 		while(1){
 			scanf("%d %d", &row, &col);
+			// testa se a jogada eh valida
 			if(row <= h_info->game->b_size && col <= h_info->game->b_size && col > 0 && row > 0 && h_info->game->board[row - 1][col - 1] == '-'){
 				break;
 			}
@@ -242,6 +258,7 @@ void *host_handler(void *arg){
 		// Aplica a jogada
 		jogapessoa(h_info->game, h_info->game->p_list[h_info->player_id].simb, row, col);	
 
+		// atualiza a ultima jogada
 		last_play.col = col;
 		last_play.row = row;
 		last_play.symb = h_info->game->p_list[h_info->player_id].simb;
@@ -249,17 +266,25 @@ void *host_handler(void *arg){
 		h_info->game->next_player = (h_info->game->next_player + 1) % (h_info->game->p_connected + 1);  	// atualiza o proximo jogador
 		last_play.next_player = h_info->game->next_player;
 
+		// define como nao processado
 		processed = 0;
+
 		pthread_mutex_unlock(&mutex);	
+		// sai da regiao critica
 	}	
 
+	// Jogo acabou
 	printf("\nFim de jogo!\n");
 
 	mostra(h_info->game);
 
 	switch(last_play.end){
 		case 1:
-			printf("\nJogador %c venceu!\n", last_play.symb);
+                         if(last_play.symb == h_info->game->p_list[0].simb){
+				printf("\n Voce venceu! Parabens!\n");	 
+			 }else{
+				 printf("\nVoce perdeu! Jogador %c venceu!\n", last_play.symb);
+			 }
 			break;
 		case -1:
 			printf("\nEmpate!\n");
@@ -296,8 +321,11 @@ void *client_handler(void *arg){
 	}		
 
 	// logica de controle da comunicacao
+	// enquanto nao acaba o jogo
 	while(!last_play.end){
+		//Entra na regiao critica
 		pthread_mutex_lock(&mutex);
+
 		// Envia o tabuleiro atualizado
 		if(!send_last_play(c_info->socket_id, &last_play)){
 			printf("Erro de comunicacao!\n");
@@ -318,6 +346,7 @@ void *client_handler(void *arg){
 		}
 		// Confere se o jogo nao acabou enquanto esperava pela condicao
 		if(last_play.end != 0){ 
+			// Libera o mutex
 			pthread_mutex_unlock(&mutex);	
 			break;
 		}
@@ -334,10 +363,14 @@ void *client_handler(void *arg){
 		c_info->game->next_player = last_play.next_player % (c_info->game->p_connected + 1);  	// atualiza o proximo jogador
 		last_play.next_player = c_info->game->next_player;
 
+		// Define o tabuleiro como nao processado
 		processed = 0;
+
 		pthread_mutex_unlock(&mutex);	
+		// Saindo da regiao critica
 	}	
 
+	// Envia o ultimo tabuleiro atualizado
 	if(!send_last_play(c_info->socket_id, &last_play)){
 		printf("Erro de comunicacao!\n");
 		exit(-1);
