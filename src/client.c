@@ -86,6 +86,8 @@ int client(){
 		game.board[last_play.row - 1][last_play.col - 1] = last_play.symb;
 		mostra(&game);
 
+		printf("%d %d\n", last_play.next_player, last_play.end);
+
 		// Elimina pacotes inconsistentes/antigos que estavam no backlog
 		if (last_player != last_play.next_player){
 			last_player = last_play.next_player;
@@ -93,8 +95,10 @@ int client(){
 			continue;
 		}
 
+		printf("%d %d\n", last_play.next_player, last_play.end);
+
 		// Se for a vez do jogador
-		if(last_play.next_player == client_basic_info.player_id && last_play.end == 0){
+		if(last_play.next_player == client_basic_info.player_id && last_play.end == 0 && last_play.next_player > 0){
 			// Avisa o usuario que eh a vez dele jogar
 			printf("\nEh sua vez! Digite sua jogada no formato 'N N', linha por coluna. Exemplo: 5 3\n");
 
@@ -112,7 +116,6 @@ int client(){
 			last_play.row = row;
 			last_play.col = col;
 			last_play.symb = client_basic_info.player_symbol;
-			last_play.next_player++;
 
 			// Envia a jogada feita
 			if(!send_last_play(c_socket, &last_play)){

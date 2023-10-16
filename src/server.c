@@ -360,7 +360,7 @@ void *client_handler(void *arg){
 		// Aplica a jogada
 		jogapessoa(c_info->game, c_info->game->p_list[c_info->player_id].simb, last_play.row, last_play.col);
 
-		c_info->game->next_player = last_play.next_player % (c_info->game->p_connected + 1);  	// atualiza o proximo jogador
+		c_info->game->next_player = (last_play.next_player + 1) % (c_info->game->p_connected + 1);  	// atualiza o proximo jogador
 		last_play.next_player = c_info->game->next_player;
 
 		// Define o tabuleiro como nao processado
