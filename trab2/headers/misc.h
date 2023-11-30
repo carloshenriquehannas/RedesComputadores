@@ -6,7 +6,7 @@
 typedef struct{
 	uint8_t *_binData;
 	int _binDataLen;
-	uint8_t _tipoDeControleDeErro;
+	int _tipoDeControleDeErro;
 	int _totalLen;
 } datagrama;
 

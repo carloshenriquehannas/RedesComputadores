@@ -3,9 +3,9 @@
 
 #include "misc.h"
 
-void AplicacaoReceptora();
+void AplicacaoReceptora(char *_str);
 
-void CamadaDeAplicacaoReceptora(char *_mensagem);
+void CamadaDeAplicacaoReceptora(datagrama *_quadro);
 
 void CamadaEnlaceDadosReceptora(datagrama *_quadro);
 
