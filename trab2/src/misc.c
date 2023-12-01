@@ -62,7 +62,7 @@ unsigned char *binToStr(datagrama *_quadro){
 	// isola cada um deles e faz um xor com um inteiro que inicialmente eh nulo
 	int _aux = 0;
 	for(int i = 0; i < _quadro->_binDataLen; i++){
-		_auxArr[_aux] = (char)(_auxArr[_aux] ^ (_quadro->_binData[i] << (7 - (i % 8))));	
+		_auxArr[_aux] = (_auxArr[_aux] ^ (_quadro->_binData[i] << (7 - (i % 8))));	
 		if((i % 8) == 7){
 			_aux++;	
 		}
