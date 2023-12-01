@@ -58,6 +58,8 @@ unsigned char *binToStr(datagrama *_quadro){
 		_auxArr[i] = 0;
 	}
 
+	// converte os bits para um inteiro
+	// isola cada um deles e faz um xor com um inteiro que inicialmente eh nulo
 	int _aux = 0;
 	for(int i = 0; i < _quadro->_binDataLen; i++){
 		_auxArr[_aux] = (char)(_auxArr[_aux] ^ (_quadro->_binData[i] << (7 - (i % 8))));	
@@ -66,6 +68,7 @@ unsigned char *binToStr(datagrama *_quadro){
 		}
 	}
 
+	// converte em caractere
 	for(int i = 0; i < _strLen; i++){
 		_str[i] = (char) _auxArr[i];
 	}
