@@ -14,7 +14,7 @@ typedef struct{
 
 void strToBin(char *_str, datagrama *_quadro);
 
-void binToStr(unsigned char *_str, datagrama *_quadro);
+unsigned char *binToStr(datagrama *_quadro);
 
 void MeioDeComunicacao(datagrama *_quadro);
 

@@ -19,6 +19,8 @@ void AplicacaoTransmissora(){
 
 void CamadaDeAplicacaoTransmissora(char *_mensagem){
 	datagrama *_quadro = malloc(sizeof(datagrama));
+
+	// converte a string de entrada para binario
 	strToBin(_mensagem, _quadro);
 
 	CamadaEnlaceDadosTransmissora(_quadro);
@@ -62,46 +64,63 @@ void CamadaEnlaceDadosTransmissoraControleDeErro(datagrama *_quadro){
 }
 
 void CamadaEnlaceDadosTransmissoraControleDeErroBitParidadePar(datagrama *_quadro){
+	// faz uma copia do quadro com um bit a mais
 	uint8_t *_aux = NULL;
 	_aux = malloc(sizeof(uint8_t)*(_quadro->_binDataLen + 1));
 	_quadro->_totalLen = _quadro->_binDataLen + 1;
 	int _oneBits = 0;
 
+	// copia os dados do quadro para o vetor auxiliar
 	CopiaDadosBin(_quadro, _aux);
 
+	// conta os bits 1
 	for(int i = 0; i < _quadro->_binDataLen; i++){
 		if(_quadro->_binData[i] == 1) _oneBits++;
 	}
+	// se for par -> nao precisa adicionar 1
 	if((_oneBits % 2) == 0){
+
+		// contagem jah eh par
 		_aux[_quadro->_totalLen - 1] = 0;
+
 	} else {
+		
+		// contagem eh impar -> adiciona um 1 para ficar par
 		_aux[_quadro->_totalLen - 1] = 1;
 		
 	}
+	// libera o quadro antigo e passa a copia com o bit de verificacao para o quadro
 	free(_quadro->_binData);
 	_quadro->_binData = _aux;
 }
 
 void CamadaEnlaceDadosTransmissoraControleDeErroBitParidadeImpar(datagrama *_quadro){
+	// faz uma copia do quadro com um bit a mais
 	uint8_t *_aux = NULL;
 	_aux = malloc(sizeof(uint8_t)*(_quadro->_binDataLen + 1));
-
 	_quadro->_totalLen = _quadro->_binDataLen + 1;
-
 	int _oneBits = 0;
 
+	// copia os dados do quadro para o vetor auxiliar
 	CopiaDadosBin(_quadro, _aux);
 
+	// conta os bits 1
 	for(int i = 0; i < _quadro->_binDataLen; i++){
-		_oneBits += _quadro->_binData[i];
+		if(_quadro->_binData[i] == 1) _oneBits++;
 	}
+	// se for impar -> nao precisa adicionar 1
 	if((_oneBits % 2) == 1){
+
+		// contagem jah eh impar
 		_aux[_quadro->_totalLen - 1] = 0;
+
 	} else {
+		
+		// contagem eh par -> adiciona um 1 para ficar par
 		_aux[_quadro->_totalLen - 1] = 1;
 		
 	}
-
+	// libera o quadro antigo e passa a copia com o bit de verificacao para o quadro
 	free(_quadro->_binData);
 	_quadro->_binData = _aux;
 }
@@ -110,17 +129,21 @@ void CamadaEnlaceDadosTransmissoraControleDeErroCRC(datagrama *_quadro){
 	// Polinomio gerador (CRC-32)
         int _polinomioGerador[TAMANHO_CRC] = {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1};
 
+	// cria um vetor de copia com mais 33 bits para o crc
 	_quadro->_totalLen = _quadro->_binDataLen + TAMANHO_CRC;
 
 	uint8_t *_aux = NULL;
 	_aux = malloc(sizeof(uint8_t) * (_quadro->_totalLen));
 	
+	// copia os dados do quadro para o vetor auxiliar
 	CopiaDadosBin(_quadro, _aux);
 
+	// zera os 33 bits adicionais
 	for(int i = _quadro->_binDataLen; i < (_quadro->_totalLen); i++){
 		_aux[i] = 0;
 	}
 
+	// faz a divisao polinomial
 	for(int i = 0; i < _quadro->_binDataLen; i++){
 		if(_aux[i] == 1){
 			for(int j = 0; j < TAMANHO_CRC; j++){
@@ -129,8 +152,10 @@ void CamadaEnlaceDadosTransmissoraControleDeErroCRC(datagrama *_quadro){
 		}
 	}
 
+	// copia os dados de volta pois foram alterados na divisao
 	CopiaDadosBin(_quadro, _aux);
 
+	// libera o quadro antigo e atribui o vetor auxiliar como novo quadro
 	free(_quadro->_binData);
 	_quadro->_binData = _aux;
 }

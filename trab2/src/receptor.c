@@ -10,11 +10,9 @@ void AplicacaoReceptora(unsigned char *_str){
 
 }
 
-void ChamadaDeAplicacaoReceptora(datagrama *_quadro){
-	unsigned char *_str = NULL;
-
+void CamadaDeAplicacaoReceptora(datagrama *_quadro){
 	// converte o binario de volta para string
-	binToStr(_str, _quadro);
+	unsigned char *_str = binToStr(_quadro);
 
 	AplicacaoReceptora(_str);
 }
@@ -23,7 +21,7 @@ void CamadaEnlaceDadosReceptora(datagrama *_quadro){
 	printf("\nMensagem binaria recebida:\n");
 
 	// imprime os valores em binario apenas para comparacao
-	for(int i = 0; i < _quadro->_binDataLen; i++){
+	for(int i = 0; i < _quadro->_totalLen; i++){
 		if((i % 8) == 0 && i != 0) printf(" ");
 		printf("%d", _quadro->_binData[i]);
 	}
@@ -31,7 +29,7 @@ void CamadaEnlaceDadosReceptora(datagrama *_quadro){
 
 	CamadaEnlaceDadosReceptoraControleDeErro(_quadro);
 
-	ChamadaDeAplicacaoReceptora(_quadro);
+		CamadaDeAplicacaoReceptora(_quadro);
 }
 
 void CamadaEnlaceDadosReceptoraControleDeErro(datagrama *_quadro){
