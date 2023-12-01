@@ -26,7 +26,7 @@ As informações do código, como explicação e documentação, encontram-se no
 ### Descrição do trabalho
 
 ### Informações do código
-Link do vídeo:
+Link do vídeo: https://drive.google.com/drive/folders/17f2ectBrZWSjGpSaerwnslMS36dQU6Vd?usp=drive_link
 
 As informações do código, como explicação e documentação, encontram-se no link acima e ao longo do código. Além disso utilizou-se, nesta prática:
 1. Compilador: gcc (GCC) 13.2.1 20230728 (Red Hat 13.2.1-1);
