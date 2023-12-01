@@ -3,6 +3,8 @@
 
 #include<stdint.h>
 
+#define TAMANHO_CRC 33
+
 typedef struct{
 	uint8_t *_binData;
 	int _binDataLen;
@@ -12,7 +14,7 @@ typedef struct{
 
 void strToBin(char *_str, datagrama *_quadro);
 
-void binToStr(char *_str, datagrama *_quadro);
+void binToStr(unsigned char *_str, datagrama *_quadro);
 
 void MeioDeComunicacao(datagrama *_quadro);
 

@@ -3,7 +3,7 @@
 
 #include "misc.h"
 
-void AplicacaoReceptora(char *_str);
+void AplicacaoReceptora(unsigned char *_str);
 
 void CamadaDeAplicacaoReceptora(datagrama *_quadro);
 

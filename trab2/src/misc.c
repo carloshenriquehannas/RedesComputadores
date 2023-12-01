@@ -21,7 +21,7 @@ void strToBin(char *_str, datagrama *_quadro){
 	_quadro->_binDataLen = 0;
 
 
-	for(size_t i = 0; i < _len; i++){
+	for(size_t i = 0; i < (_len - 1); i++){
 		uint8_t _aux = _str[i];
 
 		// para cada bit do caracter, isola apenas ele
@@ -43,20 +43,49 @@ void strToBin(char *_str, datagrama *_quadro){
 	printf("\n\n");
 }
 
-void binToStr(char *_str, datagrama *_quadro){
+void binToStr(unsigned char *_str, datagrama *_quadro){
+	// define o tamanho da string a ser reconstruida
+	int _strLen = (_quadro->_binDataLen / 8);
 
+	// vetor intermediario para converter binario -> decimal -> char
+	int _auxArr[_strLen];
 
+	// aloca o tamnaho do vetor mais 1 para o '/0'
+	_str = malloc(sizeof(char)*(_strLen + 1));
+
+	// zera a string para fazer a conversao
+	for(int i = 0; i < _strLen; i++){
+		_auxArr[i] = 0;
+	}
+
+	int _aux = 0;
+	for(int i = 0; i < _quadro->_binDataLen; i++){
+		_auxArr[_aux] = (char)(_str[_aux] ^ (_quadro->_binData[i] << (7 - (i % 8))));	
+		if((i % 8) == 7){
+			_aux++;	
+		}
+	}
+
+	for(int i = 0; i < _strLen; i++){
+		_str[i] = (char) _auxArr[i];
+	}
+	_str[_strLen] = '\0';
 
 }
 
 void MeioDeComunicacao(datagrama *_quadro){
-	int _porcentagemDeErros = 10;    	// porcentagem de erros padrao
+	int _porcentagemDeErros;	
 
 	printf("Digite a porcentagem de erros (e.g. 20, 30, 70):\n");
-	scanf("%d\n", &_porcentagemDeErros);
+	scanf("%d", &_porcentagemDeErros);
+	if(_porcentagemDeErros > 100 || _porcentagemDeErros < 0){
+		printf("Entrada invalida! Utilizando erro padrao de 5 porcento\n\n");
+		_porcentagemDeErros = 5;    	// porcentagem de erros padrao
+
+	}
 
 	for(int i = 0; i < _quadro->_totalLen; i++){
-		if((rand() % 101) <= _porcentagemDeErros){
+		if((rand() % 101) < _porcentagemDeErros){
 			// se deu erro, inverte o bit
 			_quadro->_binData[i] = (_quadro->_binData[i] ^ 1);
 		}

@@ -7,3 +7,10 @@ compile:
 
 run:
 	./prog
+
+debug: 
+	gcc -g ./src/*c
+	gdb a.out
+	rm a.out
+clear:
+	rm *.o prog a.out
