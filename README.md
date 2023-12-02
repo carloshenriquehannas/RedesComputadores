@@ -23,6 +23,8 @@ As informações do código, como explicação e documentação, encontram-se no
 ---
 ## Trabalho 2
 
+Esse segundo trabalho visa apresentar e testar algoritmos de detecção de erros em uma simulação do funcionamento de uma rede. Os algoritmos disponíveis são Bit de Paridade Par, Bit de Paridade Ímpar e o CRC-32 utilizando o polinômio IEEE 8802. Faz-se a simulação das camadas de aplicação e enlace, com uma certa abstração das camadas de transporte e física, simulando a chance de se ter algum erro no transporte de informação;
+
 ### Descrição do trabalho
 
 ### Informações do código
