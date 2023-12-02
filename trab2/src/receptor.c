@@ -29,7 +29,7 @@ void CamadaEnlaceDadosReceptora(datagrama *_quadro){
 
 	CamadaEnlaceDadosReceptoraControleDeErro(_quadro);
 
-		CamadaDeAplicacaoReceptora(_quadro);
+	CamadaDeAplicacaoReceptora(_quadro);
 }
 
 void CamadaEnlaceDadosReceptoraControleDeErro(datagrama *_quadro){
