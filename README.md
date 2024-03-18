@@ -1,5 +1,5 @@
 # Redes de Computadores
-Trabalhos práticos da disciplina de Redes de Computadores
+Trabalhos práticos da disciplina de Redes de Computadores.
 
 ---
 ## Trabalho 1: Jogo da velha ++
