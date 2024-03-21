@@ -2,7 +2,7 @@
 Trabalhos práticos da disciplina de Redes de Computadores.
 
 ---
-## Trabalho 1: Jogo da velha ++
+## Trabalho 1: Jogo da Velha ++
 
 ### Descrição do jogo
 O Jogo da Velha++ é um game em que você define o modo de jogar o jogo da velha - é uma expansão do jogo da velha clássico. Inicialmente você deverá configurar a sua maneira de jogo, i.e, tamanho de tabuleiro, tamanho de sequência que define um vencedor, quantos jogadores irão jogar e se algum deles será controlado ou não por uma máquina virtual.
@@ -24,8 +24,6 @@ As informações do código, como explicação e documentação, encontram-se no
 ## Trabalho 2
 
 Esse segundo trabalho visa apresentar e testar algoritmos de detecção de erros em uma simulação do funcionamento de uma rede. Os algoritmos disponíveis são Bit de Paridade Par, Bit de Paridade Ímpar e o CRC-32 utilizando o polinômio IEEE 8802. Faz-se a simulação das camadas de aplicação e enlace, com uma certa abstração das camadas de transporte e física, simulando a chance de se ter algum erro no transporte de informação;
-
-### Descrição do trabalho
 
 ### Informações do código
 Link do vídeo: https://drive.google.com/drive/folders/17f2ectBrZWSjGpSaerwnslMS36dQU6Vd?usp=drive_link
